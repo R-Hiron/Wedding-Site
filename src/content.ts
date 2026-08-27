@@ -42,7 +42,7 @@ export const home = {
   welcomeTitle: 'You are invited',
   welcomeBody: `We're so glad you're here. This little corner of the internet is where you'll find everything you need for our wedding day — how to RSVP, answers to common questions, and (soon) all the details once we've locked them in.`,
   signOff: 'With all our love,',
-  formalNote: 'Formal invitation to follow',
+  formalNote: '',
   countdownLabel: 'Our forever begins in',
 } as const
 
