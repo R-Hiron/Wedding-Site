@@ -1,0 +1,34 @@
+:root {
+  /* Palette — cream paper & brown ink */
+  --color-cream: #f6f1e8;
+  --color-cream-dark: #ebe4d8;
+  --color-ink: #3d2c22;
+  --color-ink-soft: #5c4638;
+  --color-chocolate: #2a241f;
+  --color-taupe: #c4b8a8;
+  --color-taupe-hover: #b5a898;
+  --color-olive: #6b7a4e;
+  --color-olive-hover: #5a6841;
+  --color-white: #fffcf7;
+  --color-border: #3d2c22;
+
+  /* Type */
+  --font-script: 'Great Vibes', cursive;
+  --font-serif: 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-sans: 'Montserrat', system-ui, sans-serif;
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 1.5rem;
+  --space-lg: 2.5rem;
+  --space-xl: 4rem;
+  --space-2xl: 6rem;
+
+  --max-width: 42rem;
+  --max-width-wide: 64rem;
+  --nav-height: 3.5rem;
+
+  --radius: 0.35rem;
+  --transition: 180ms ease;
+}

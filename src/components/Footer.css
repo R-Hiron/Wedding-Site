@@ -1,0 +1,20 @@
+.site-footer {
+  margin-top: auto;
+  padding: var(--space-lg) var(--space-sm);
+  text-align: center;
+  background: var(--color-chocolate);
+  color: var(--color-cream);
+}
+
+.site-footer__names {
+  margin: 0 0 var(--space-xs);
+  font-size: 0.95rem;
+  letter-spacing: 0.22em;
+}
+
+.site-footer__date {
+  margin: 0;
+  font-size: 0.65rem;
+  opacity: 0.8;
+  letter-spacing: 0.25em;
+}

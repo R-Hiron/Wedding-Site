@@ -1,0 +1,262 @@
+.envelope-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: var(--color-cream);
+  transition: opacity 400ms ease;
+}
+
+.envelope-intro.is-opening {
+  opacity: 0;
+  transition-delay: 1700ms;
+  pointer-events: none;
+}
+
+.envelope-intro__trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-sm);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-ink);
+  font: inherit;
+}
+
+.envelope-intro__trigger:focus-visible {
+  outline: 2px solid var(--color-olive);
+  outline-offset: 6px;
+  border-radius: var(--radius);
+}
+
+.envelope-intro__title {
+  margin: 0;
+  font-size: clamp(2.25rem, 9vw, 3.5rem);
+  line-height: 1.1;
+}
+
+.envelope-intro__hint {
+  margin: 0;
+  font-size: 0.6rem;
+  color: var(--color-ink-soft);
+  animation: envelope-pulse 2.4s ease-in-out infinite;
+}
+
+.is-opening .envelope-intro__hint,
+.is-opening .envelope-intro__title {
+  opacity: 0;
+  animation: none;
+  transition: opacity 500ms ease;
+}
+
+@keyframes envelope-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Scene */
+
+.envelope-scene {
+  perspective: 1400px;
+  padding-top: 3.5rem; /* room for the flap to swing open */
+}
+
+/* Periodic nudge so an untouched envelope invites a click. */
+.envelope-wobble {
+  animation: envelope-nudge 6.5s ease-in-out 2.5s infinite;
+}
+
+.envelope-intro__trigger:hover .envelope-wobble,
+.envelope-intro__trigger:focus-visible .envelope-wobble,
+.is-opening .envelope-wobble {
+  animation: none;
+}
+
+@keyframes envelope-nudge {
+  0%,
+  9%,
+  100% {
+    transform: none;
+  }
+  1.4% {
+    transform: translateX(-4px) rotate(-2.4deg);
+  }
+  3% {
+    transform: translateX(4px) rotate(2.1deg);
+  }
+  4.6% {
+    transform: translateX(-3px) rotate(-1.5deg);
+  }
+  6.2% {
+    transform: translateX(2px) rotate(0.9deg);
+  }
+  7.6% {
+    transform: translateX(-1px) rotate(-0.4deg);
+  }
+}
+
+.envelope {
+  position: relative;
+  width: clamp(15rem, 78vw, 22rem);
+  aspect-ratio: 320 / 210;
+  transform-style: preserve-3d;
+  transition:
+    transform 600ms ease,
+    opacity 500ms ease;
+}
+
+.envelope:hover {
+  transform: translateY(-4px);
+}
+
+.is-opening .envelope {
+  transform: translateY(-8px) scale(1.04);
+  opacity: 0;
+  transition-delay: 1500ms;
+}
+
+.envelope__body,
+.envelope__flap {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  color: var(--color-ink);
+}
+
+.envelope__body {
+  top: 0;
+  height: 100%;
+  z-index: 3;
+  filter: drop-shadow(0 10px 18px rgb(61 44 34 / 0.15));
+}
+
+.envelope__flap {
+  top: 0;
+  height: 58.1%; /* 122 / 210 */
+  z-index: 4;
+  transform-origin: top center;
+  transition: transform 700ms cubic-bezier(0.5, 0, 0.35, 1);
+}
+
+/* Once the flap is open it must sit behind the rising letter. */
+.is-opening .envelope__flap {
+  transform: rotateX(-172deg);
+  z-index: 1;
+  transition:
+    transform 700ms cubic-bezier(0.5, 0, 0.35, 1) 380ms,
+    z-index 0s 900ms;
+}
+
+/* Letter */
+
+.envelope__letter {
+  position: absolute;
+  left: 7%;
+  bottom: 5%;
+  width: 86%;
+  height: 84%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 45%, transparent);
+  border-radius: 3px;
+  box-shadow: 0 -6px 14px rgb(61 44 34 / 0.12);
+  transition: transform 800ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.is-opening .envelope__letter {
+  transform: translateY(-88%);
+  transition-delay: 950ms;
+}
+
+.envelope__letter-names {
+  margin: 0;
+  font-size: clamp(1rem, 4vw, 1.35rem);
+  letter-spacing: 0.22em;
+}
+
+.envelope__letter-rule {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  background: color-mix(in srgb, var(--color-ink) 40%, transparent);
+}
+
+.envelope__letter-date {
+  margin: 0;
+  font-size: 0.6rem;
+  color: var(--color-ink-soft);
+}
+
+/* Wax seal */
+
+.envelope__seal {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  z-index: 5;
+  width: clamp(3.25rem, 16vw, 4.5rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 3px 5px rgb(43 51 25 / 0.35));
+}
+
+.envelope__seal svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.envelope__seal-monogram {
+  font-family: var(--font-serif);
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  fill: #f2f4e6;
+  stroke: #2f3a1b;
+  stroke-width: 0.9px;
+  stroke-opacity: 0.55;
+  paint-order: stroke fill;
+}
+
+.envelope__seal-half {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform 600ms cubic-bezier(0.35, 0, 0.4, 1),
+    opacity 600ms ease;
+}
+
+.is-opening .envelope__seal-half--left {
+  transform: translate(-26%, 16%) rotate(-26deg);
+  opacity: 0;
+}
+
+.is-opening .envelope__seal-half--right {
+  transform: translate(26%, 16%) rotate(26deg);
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .envelope-intro,
+  .envelope-intro *,
+  .envelope-intro *::before,
+  .envelope-intro *::after {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    animation: none !important;
+  }
+}
