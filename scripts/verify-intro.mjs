@@ -27,6 +27,16 @@ await page.goto(BASE, { waitUntil: 'networkidle0' })
 check('intro shows on first visit', await introVisible())
 check('intro starts by delivering', (await phase()).includes('is-delivering'), await phase())
 
+// The puppy has to stay on screen long enough to actually be watched, so check
+// the delivery is still running a good way in rather than flashing past.
+await page.waitForSelector('.intro-puppy', { timeout: 5000 })
+await new Promise((resolve) => setTimeout(resolve, 1400))
+check(
+  'puppy still on screen 1.4s into the delivery',
+  (await phase()).includes('is-delivering'),
+  await phase(),
+)
+
 // Delivery hands off to the tappable envelope on its own.
 await page.waitForFunction(
   () => document.querySelector('.envelope-intro')?.classList.contains('is-closed'),

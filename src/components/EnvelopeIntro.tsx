@@ -14,6 +14,20 @@ const OPEN_DURATION = 2100
 /** How small the envelope is while the puppy carries it in its mouth. */
 const CARRY_SCALE = 0.17
 
+/** Seconds the puppy spends running in, kept slow enough to be watchable. */
+const RUN_IN_DURATION = 1.7
+
+/** Length of one half of a gait bob, i.e. up or down. */
+const BOB_STEP = 0.19
+
+/**
+ * Bob repeats that fit within a run of the given length, rounded down so the
+ * gait always finishes before the puppy comes to a stop.
+ */
+function bobRepeats(duration: number): number {
+  return Math.max(1, Math.floor(duration / BOB_STEP) - 1)
+}
+
 export function EnvelopeIntro({ onFinish }: { onFinish: () => void }) {
   const [phase, setPhase] = useState<Phase>(() =>
     prefersReducedMotion() ? 'closed' : 'delivering',
@@ -78,33 +92,52 @@ export function EnvelopeIntro({ onFinish }: { onFinish: () => void }) {
       const tl = gsap.timeline({ onComplete: () => setPhase('closed') })
       deliveryRef.current = tl
 
-      // Run in, with a gentle gait bob shared by puppy and envelope.
-      tl.to(puppy, { x: slowX, duration: 0.85, ease: 'power1.out' })
-        .to(carry, { x: slowX + carryOffsetX, duration: 0.85, ease: 'power1.out' }, '<')
-        .to(puppy, { y: -7, duration: 0.17, repeat: 4, yoyo: true, ease: 'sine.inOut' }, '<')
-        .to(
-          carry,
-          { y: carryOffsetY - 7, duration: 0.17, repeat: 4, yoyo: true, ease: 'sine.inOut' },
-          '<',
-        )
+      // Beats are placed at explicit times rather than appended, because the
+      // gait bob runs alongside the travel tweens and would otherwise push
+      // later beats out to wherever it happens to end.
+      const CRUISE = RUN_IN_DURATION * 0.7
+      const SETTLE = RUN_IN_DURATION - CRUISE
+      const DROP = 0.42
+      const REACT = 0.3
+      const EXIT = 0.7
+      const dropAt = RUN_IN_DURATION
+      const exitAt = dropAt + DROP + REACT
+
+      // Most of the run happens at a steady pace so the puppy is easy to watch,
+      // and it only decelerates as it nears the centre.
+      const cruiseX = slowX - width * 0.14
+      const runBob = {
+        duration: BOB_STEP,
+        repeat: bobRepeats(RUN_IN_DURATION),
+        yoyo: true,
+        ease: 'sine.inOut',
+      }
+
+      tl.to(puppy, { x: cruiseX, duration: CRUISE, ease: 'none' }, 0)
+        .to(carry, { x: cruiseX + carryOffsetX, duration: CRUISE, ease: 'none' }, 0)
+        .to(puppy, { y: -7, ...runBob }, 0)
+        .to(carry, { y: carryOffsetY - 7, ...runBob }, 0)
+        .to(puppy, { x: slowX, duration: SETTLE, ease: 'power2.out' }, CRUISE)
+        .to(carry, { x: slowX + carryOffsetX, duration: SETTLE, ease: 'power2.out' }, CRUISE)
 
       // Drop: the card falls the short distance to the ground and settles at a
       // slight angle, as a dropped card would.
-      tl.call(() => setPose('look'))
-        .to(puppy, { y: 0, duration: 0.18 })
-        .to(carry, { y: groundY, rotate: -4, duration: 0.42, ease: 'bounce.out' }, '<')
-
-      // Beat where the puppy looks at what it delivered.
-      tl.to({}, { duration: 0.3 })
+      tl.call(() => setPose('look'), undefined, dropAt)
+        .to(puppy, { y: 0, duration: 0.18 }, dropAt)
+        .to(carry, { y: groundY, rotate: -4, duration: DROP, ease: 'bounce.out' }, dropAt)
 
       // Off it goes, and the invitation grows into place as it leaves.
-      tl.call(() => setPose('run'))
-        .to(puppy, { x: exitX, duration: 0.7, ease: 'power1.in' })
-        .to(puppy, { y: -6, duration: 0.16, repeat: 3, yoyo: true, ease: 'sine.inOut' }, '<')
+      tl.call(() => setPose('run'), undefined, exitAt)
+        .to(puppy, { x: exitX, duration: EXIT, ease: 'power1.in' }, exitAt)
+        .to(
+          puppy,
+          { y: -6, duration: 0.16, repeat: 3, yoyo: true, ease: 'sine.inOut' },
+          exitAt,
+        )
         .to(
           carry,
           { x: 0, y: 0, rotate: 0, scale: 1, duration: 0.72, ease: 'power2.inOut' },
-          '<+=0.12',
+          exitAt + 0.12,
         )
     })
 

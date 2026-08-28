@@ -79,14 +79,17 @@
 }
 
 .intro-puppy {
+  --puppy-width: clamp(13rem, 62vw, 22rem);
+
   position: absolute;
   left: 50%;
   bottom: -22%;
   z-index: 1;
-  width: clamp(13rem, 62vw, 22rem);
-  /* Centring uses the standalone translate property so it composes with the
-     transform GSAP writes rather than fighting it. */
-  translate: -50% 0;
+  width: var(--puppy-width);
+  /* Centred with a margin rather than a translate, because GSAP clears the
+     standalone translate property when it takes over the element's transform,
+     which would shift the puppy away from the measured carry offset. */
+  margin-left: calc(var(--puppy-width) / -2);
   will-change: transform;
 }
 
