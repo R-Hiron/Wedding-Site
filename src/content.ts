@@ -35,6 +35,8 @@ export const envelope = {
   hint: 'Tap to open',
   /** Initials on the wax seal. */
   initials: 'R & L',
+  /** Discreet control on the home page that replays the whole intro. */
+  replayLabel: 'Replay invitation',
 } as const
 
 export const home = {

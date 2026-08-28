@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { EnvelopeIntro } from './components/EnvelopeIntro'
+import { IntroContext } from './lib/introContext'
+import { hasSeenIntro, markIntroSeen } from './lib/introSession'
 import { Layout } from './components/Layout'
 import { Home } from './pages/Home'
 import { Faq } from './pages/Faq'
@@ -23,11 +25,23 @@ function Gated({
 }
 
 export default function App() {
-  const [introDone, setIntroDone] = useState(!visibility.showEnvelopeIntro)
+  // Automatic intro plays once per browsing session; the replay control on the
+  // home page can bring it back without clearing storage.
+  const [introOpen, setIntroOpen] = useState(
+    () => visibility.showEnvelopeIntro && !hasSeenIntro(),
+  )
+
+  const replay = useCallback(() => setIntroOpen(true), [])
+
+  const finishIntro = useCallback(() => {
+    markIntroSeen()
+    setIntroOpen(false)
+  }, [])
 
   return (
+    <IntroContext.Provider value={{ replay }}>
     <BrowserRouter>
-      {!introDone ? <EnvelopeIntro onFinish={() => setIntroDone(true)} /> : null}
+      {introOpen ? <EnvelopeIntro onFinish={finishIntro} /> : null}
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
@@ -75,5 +89,6 @@ export default function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </IntroContext.Provider>
   )
 }

@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
-import { couple, wedding, home, visibility } from '../content'
+import { couple, wedding, home, visibility, envelope } from '../content'
 import { Countdown } from '../components/Countdown'
 import { FloralCorners } from '../components/FloralCorners'
+import { useIntro } from '../lib/introContext'
 import './Home.css'
 
 export function Home() {
+  const { replay } = useIntro()
+
   return (
     <div className="home">
       <section className="home-hero">
@@ -20,7 +23,15 @@ export function Home() {
           src="/images/save-the-date.png"
           alt="Line drawing of Riley and Lexi's pets around a champagne tower — save the date"
         />
-        <p className="home-hero__formal sans-caps">{home.formalNote}</p>
+        {home.formalNote ? (
+          <p className="home-hero__formal sans-caps">{home.formalNote}</p>
+        ) : null}
+
+        {visibility.showEnvelopeIntro ? (
+          <button type="button" className="home-hero__replay sans-caps" onClick={replay}>
+            {envelope.replayLabel}
+          </button>
+        ) : null}
       </section>
 
       <section className="home-welcome">

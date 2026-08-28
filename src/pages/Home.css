@@ -42,6 +42,25 @@
   color: var(--color-ink-soft);
 }
 
+.home-hero__replay {
+  margin-top: var(--space-sm);
+  padding: 0.5rem 0.9rem;
+  font-size: 0.55rem;
+  color: var(--color-ink-soft);
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 25%, transparent);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition:
+    color var(--transition),
+    border-color var(--transition);
+}
+
+.home-hero__replay:hover {
+  color: var(--color-ink);
+  border-color: color-mix(in srgb, var(--color-ink) 55%, transparent);
+}
+
 .home-welcome {
   position: relative;
   text-align: center;

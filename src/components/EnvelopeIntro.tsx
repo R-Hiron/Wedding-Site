@@ -1,14 +1,28 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { gsap } from 'gsap'
 import { envelope, wedding } from '../content'
+import { prefersReducedMotion } from '../lib/introSession'
+import { PUPPY_MOUTH, type PuppyPose } from '../lib/puppyArt'
+import { Puppy } from './Puppy'
 import './EnvelopeIntro.css'
 
-type Phase = 'closed' | 'opening' | 'gone'
+type Phase = 'delivering' | 'closed' | 'opening' | 'gone'
 
 /** Total ms from click until the overlay unmounts. Keep in sync with the CSS. */
 const OPEN_DURATION = 2100
 
+/** How small the envelope is while the puppy carries it in its mouth. */
+const CARRY_SCALE = 0.17
+
 export function EnvelopeIntro({ onFinish }: { onFinish: () => void }) {
-  const [phase, setPhase] = useState<Phase>('closed')
+  const [phase, setPhase] = useState<Phase>(() =>
+    prefersReducedMotion() ? 'closed' : 'delivering',
+  )
+  const [pose, setPose] = useState<PuppyPose>('run')
+
+  const puppyRef = useRef<HTMLDivElement>(null)
+  const carryRef = useRef<HTMLDivElement>(null)
+  const deliveryRef = useRef<gsap.core.Timeline | null>(null)
 
   useEffect(() => {
     const previous = document.body.style.overflow
@@ -18,17 +32,103 @@ export function EnvelopeIntro({ onFinish }: { onFinish: () => void }) {
     }
   }, [])
 
-  function open() {
-    if (phase !== 'closed') return
-    setPhase('opening')
+  /**
+   * Puppy delivery: run in carrying the envelope, drop it, glance at it, run
+   * off. The envelope settles into the resting position the rest of the intro
+   * already uses, so the handoff is seamless.
+   */
+  useEffect(() => {
+    if (phase !== 'delivering') return
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const puppy = puppyRef.current
+    const carry = carryRef.current
+    if (!puppy || !carry) return
+
+    const ctx = gsap.context(() => {
+      const width = window.innerWidth
+      const startX = -0.82 * width
+      const slowX = -0.12 * width
+      const exitX = 0.95 * width
+
+      // Measure both elements at rest, then work out the offset that hangs the
+      // shrunken envelope from the puppy's muzzle. Deriving it from real
+      // geometry keeps the carry aligned at any screen size.
+      const puppyBox = puppy.getBoundingClientRect()
+      const carryBox = carry.getBoundingClientRect()
+      const mouthX = puppyBox.left + puppyBox.width * PUPPY_MOUTH.x
+      const mouthY = puppyBox.top + puppyBox.height * PUPPY_MOUTH.y
+      // Nudge the card down and forward from the muzzle so it dangles from the
+      // mouth rather than covering the puppy's head.
+      const carryOffsetX =
+        mouthX - (carryBox.left + carryBox.width / 2) + (carryBox.width * CARRY_SCALE) / 2
+      const carryOffsetY =
+        mouthY - (carryBox.top + carryBox.height / 2) + (carryBox.height * CARRY_SCALE) / 2
+
+      gsap.set(puppy, { x: startX, y: 0 })
+      gsap.set(carry, {
+        x: startX + carryOffsetX,
+        y: carryOffsetY,
+        rotate: -12,
+        scale: CARRY_SCALE,
+      })
+
+      // Where the card comes to rest on the ground, just in front of the paws.
+      const groundY = carryOffsetY + puppyBox.height * 0.16
+
+      const tl = gsap.timeline({ onComplete: () => setPhase('closed') })
+      deliveryRef.current = tl
+
+      // Run in, with a gentle gait bob shared by puppy and envelope.
+      tl.to(puppy, { x: slowX, duration: 0.85, ease: 'power1.out' })
+        .to(carry, { x: slowX + carryOffsetX, duration: 0.85, ease: 'power1.out' }, '<')
+        .to(puppy, { y: -7, duration: 0.17, repeat: 4, yoyo: true, ease: 'sine.inOut' }, '<')
+        .to(
+          carry,
+          { y: carryOffsetY - 7, duration: 0.17, repeat: 4, yoyo: true, ease: 'sine.inOut' },
+          '<',
+        )
+
+      // Drop: the card falls the short distance to the ground and settles at a
+      // slight angle, as a dropped card would.
+      tl.call(() => setPose('look'))
+        .to(puppy, { y: 0, duration: 0.18 })
+        .to(carry, { y: groundY, rotate: -4, duration: 0.42, ease: 'bounce.out' }, '<')
+
+      // Beat where the puppy looks at what it delivered.
+      tl.to({}, { duration: 0.3 })
+
+      // Off it goes, and the invitation grows into place as it leaves.
+      tl.call(() => setPose('run'))
+        .to(puppy, { x: exitX, duration: 0.7, ease: 'power1.in' })
+        .to(puppy, { y: -6, duration: 0.16, repeat: 3, yoyo: true, ease: 'sine.inOut' }, '<')
+        .to(
+          carry,
+          { x: 0, y: 0, rotate: 0, scale: 1, duration: 0.72, ease: 'power2.inOut' },
+          '<+=0.12',
+        )
+    })
+
+    return () => {
+      deliveryRef.current = null
+      ctx.revert()
+    }
+  }, [phase])
+
+  function handleClick() {
+    // A click during delivery skips ahead rather than opening the envelope.
+    if (phase === 'delivering') {
+      deliveryRef.current?.progress(1)
+      return
+    }
+    if (phase !== 'closed') return
+
+    setPhase('opening')
     window.setTimeout(
       () => {
         setPhase('gone')
         onFinish()
       },
-      reduceMotion ? 200 : OPEN_DURATION,
+      prefersReducedMotion() ? 200 : OPEN_DURATION,
     )
   }
 
@@ -39,53 +139,74 @@ export function EnvelopeIntro({ onFinish }: { onFinish: () => void }) {
       <button
         type="button"
         className="envelope-intro__trigger"
-        onClick={open}
+        onClick={handleClick}
         aria-label={`${envelope.title} — ${envelope.hint}`}
       >
         <p className="envelope-intro__title script">{envelope.title}</p>
 
         <div className="envelope-scene">
-          <div className="envelope-wobble">
-          <div className="envelope">
-            <div className="envelope__letter">
-              <p className="envelope__letter-names serif-caps">{envelope.initials}</p>
-              <span className="envelope__letter-rule" aria-hidden="true" />
-              <p className="envelope__letter-date sans-caps">{wedding.dateShort}</p>
+          {phase === 'delivering' ? (
+            <div className="intro-puppy" ref={puppyRef}>
+              <Puppy pose={pose} />
             </div>
+          ) : null}
 
-            <svg className="envelope__body" viewBox="0 0 320 210" fill="none" aria-hidden="true">
-              <rect
-                x="1"
-                y="1"
-                width="318"
-                height="208"
-                rx="6"
-                fill="var(--color-white)"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-              <path
-                d="M1 208 L160 108 L319 208"
-                fill="var(--color-cream)"
-                stroke="currentColor"
-                strokeWidth="1.6"
-              />
-              <path d="M1 2 L128 92" stroke="currentColor" strokeWidth="1.2" opacity="0.55" />
-              <path d="M319 2 L192 92" stroke="currentColor" strokeWidth="1.2" opacity="0.55" />
-            </svg>
+          {/* Two wrappers: the carry is driven by GSAP during the delivery,
+              while the wobble runs the CSS idle nudge. Keeping them separate
+              stops the two from writing to the same transform. */}
+          <div className="envelope-carry" ref={carryRef}>
+            <div className="envelope-wobble">
+              <div className="envelope">
+                <div className="envelope__letter">
+                  <p className="envelope__letter-names serif-caps">{envelope.initials}</p>
+                  <span className="envelope__letter-rule" aria-hidden="true" />
+                  <p className="envelope__letter-date sans-caps">{wedding.dateShort}</p>
+                </div>
 
-            <svg className="envelope__flap" viewBox="0 0 320 122" fill="none" aria-hidden="true">
-              <path
-                d="M1 2 L160 118 L319 2"
-                fill="var(--color-cream-dark)"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinejoin="round"
-              />
-            </svg>
+                <svg
+                  className="envelope__body"
+                  viewBox="0 0 320 210"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <rect
+                    x="1"
+                    y="1"
+                    width="318"
+                    height="208"
+                    rx="6"
+                    fill="var(--color-white)"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M1 208 L160 108 L319 208"
+                    fill="var(--color-cream)"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                  />
+                  <path d="M1 2 L128 92" stroke="currentColor" strokeWidth="1.2" opacity="0.55" />
+                  <path d="M319 2 L192 92" stroke="currentColor" strokeWidth="1.2" opacity="0.55" />
+                </svg>
 
-            <WaxSeal initials={envelope.initials} />
-          </div>
+                <svg
+                  className="envelope__flap"
+                  viewBox="0 0 320 122"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M1 2 L160 118 L319 2"
+                    fill="var(--color-cream-dark)"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+
+                <WaxSeal initials={envelope.initials} />
+              </div>
+            </div>
           </div>
         </div>
 

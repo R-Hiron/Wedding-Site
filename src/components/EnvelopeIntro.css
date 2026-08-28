@@ -66,8 +66,46 @@
 /* Scene */
 
 .envelope-scene {
+  position: relative;
   perspective: 1400px;
   padding-top: 3.5rem; /* room for the flap to swing open */
+}
+
+/* Moved by GSAP during the puppy delivery; identity once the envelope rests. */
+.envelope-carry {
+  position: relative;
+  z-index: 2;
+  will-change: transform;
+}
+
+.intro-puppy {
+  position: absolute;
+  left: 50%;
+  bottom: -22%;
+  z-index: 1;
+  width: clamp(13rem, 62vw, 22rem);
+  /* Centring uses the standalone translate property so it composes with the
+     transform GSAP writes rather than fighting it. */
+  translate: -50% 0;
+  will-change: transform;
+}
+
+/* Title and hint stay out of the way until the envelope has been delivered.
+   The hint needs its pulse cancelled, since an animation would win over
+   the opacity declaration. */
+.is-delivering .envelope-intro__title,
+.is-delivering .envelope-intro__hint {
+  opacity: 0;
+  animation: none;
+}
+
+.envelope-intro__title {
+  transition: opacity 500ms ease;
+}
+
+/* The idle nudge must not fight the delivery transforms. */
+.is-delivering .envelope-wobble {
+  animation: none;
 }
 
 /* Periodic nudge so an untouched envelope invites a click. */
