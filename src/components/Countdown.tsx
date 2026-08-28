@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { wedding, home } from '../content'
+import { countdown, wedding } from '../content'
+import { resolveCountdownMessage } from '../lib/countdownMessage'
 import './Countdown.css'
 
 type Remaining = {
@@ -39,10 +40,12 @@ export function Countdown() {
     return () => window.clearInterval(id)
   }, [])
 
+  const message = resolveCountdownMessage(countdown, remaining.days, remaining.done)
+
   if (remaining.done) {
     return (
       <section className="countdown" aria-live="polite">
-        <p className="countdown__label script">Today is the day</p>
+        <p className="countdown__label script">{message}</p>
       </section>
     )
   }
@@ -56,7 +59,7 @@ export function Countdown() {
 
   return (
     <section className="countdown" aria-live="polite">
-      <p className="countdown__label script">{home.countdownLabel}</p>
+      <p className="countdown__label script">{message}</p>
       <div className="countdown__grid">
         {units.map((unit, i) => (
           <div key={unit.label} className="countdown__unit">

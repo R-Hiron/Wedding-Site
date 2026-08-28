@@ -43,7 +43,47 @@ export const home = {
   welcomeBody: `We're so glad you're here. This little corner of the internet is where you'll find everything you need for our wedding day — how to RSVP, answers to common questions, and (soon) all the details once we've locked them in.`,
   signOff: 'With all our love,',
   formalNote: '',
-  countdownLabel: 'Our forever begins in',
+} as const
+
+export type CountdownMilestone = {
+  /** Applies when the days remaining are this number or fewer. */
+  upToDays: number
+  message: string
+}
+
+/**
+ * Headline above the countdown clock. The wording changes as the wedding
+ * approaches. Any message may include `{days}`, which is replaced with the
+ * number of whole days remaining.
+ */
+export const countdown = {
+  /** Used while further out than every milestone below. */
+  defaultMessage: 'Our forever begins in',
+
+  /**
+   * Milestones are checked from the smallest `upToDays` upward, and the first
+   * one that still covers the days remaining wins.
+   */
+  milestones: [
+    { upToDays: 0, message: "Today's the day!" },
+    { upToDays: 1, message: 'Tomorrow. ❤️' },
+    { upToDays: 7, message: 'This week!' },
+    { upToDays: 30, message: 'One month to go' },
+    { upToDays: 180, message: "It's getting closer..." },
+    { upToDays: 365, message: 'Less than a year to go' },
+  ] satisfies CountdownMilestone[] as CountdownMilestone[],
+
+  /**
+   * Messages for one specific day only. These beat the milestone ranges, so a
+   * landmark like day 100 reads correctly instead of being swallowed by the
+   * "one month to go" style bands.
+   */
+  onExactDays: {
+    100: '100 days until forever',
+  } as Record<number, string>,
+
+  /** Once the ceremony time has passed. */
+  afterMessage: 'And so our forever begins.',
 } as const
 
 export type FaqItem = { question: string; answer: string }
