@@ -32,7 +32,7 @@ export const visibility = {
    * Wedding-day timeline on the home page. Keep this off until the times in
    * `timeline.events` are real — the placeholders below are guesses.
    */
-  showTimeline: true,
+  showTimeline: false,
   /**
    * Relationship scrapbook on the home page. Keep this off until real photos
    * and captions are in place.
