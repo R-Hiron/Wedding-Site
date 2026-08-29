@@ -9,8 +9,14 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "art:puppy": "node scripts/convert-puppy.mjs",
+    "art:photos": "node scripts/convert-photos.mjs",
+    "art:card": "node scripts/convert-save-the-date.mjs",
     "verify:intro": "node scripts/verify-intro.mjs",
-    "verify:timeline": "node scripts/verify-timeline.mjs"
+    "verify:timeline": "node scripts/verify-timeline.mjs",
+    "verify:scrapbook": "node scripts/verify-scrapbook.mjs",
+    "verify:rsvp": "node scripts/verify-rsvp.mjs",
+    "check:rsvp": "node scripts/check-endpoint.mjs",
+    "verify:card": "node scripts/verify-save-the-date.mjs"
   },
   "dependencies": {
     "gsap": "^3.15.0",

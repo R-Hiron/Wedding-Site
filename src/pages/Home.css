@@ -30,12 +30,6 @@
   color: var(--color-ink-soft);
 }
 
-.home-hero__art {
-  width: min(100%, 22rem);
-  margin: var(--space-lg) auto var(--space-md);
-  filter: contrast(1.05);
-}
-
 .home-hero__formal {
   margin: 0;
   font-size: 0.6rem;

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { EnvelopeIntro } from './components/EnvelopeIntro'
@@ -38,8 +38,10 @@ export default function App() {
     setIntroOpen(false)
   }, [])
 
+  const intro = useMemo(() => ({ replay, isOpen: introOpen }), [replay, introOpen])
+
   return (
-    <IntroContext.Provider value={{ replay }}>
+    <IntroContext.Provider value={intro}>
     <BrowserRouter>
       {introOpen ? <EnvelopeIntro onFinish={finishIntro} /> : null}
       <Routes>

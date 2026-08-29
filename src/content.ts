@@ -21,9 +21,9 @@ export const wedding = {
  * Nav and routes respect these flags.
  */
 export const visibility = {
-  showVenue: false,
-  showDetails: false,
-  showWeddingParty: false,
+  showVenue: false, // False Until Final invitations go out
+  showDetails: false, // False Until Final invitations go out
+  showWeddingParty: false, // False Until Final invitations go out
   showRsvp: true,
   showFaq: true,
   /** Envelope intro overlay shown on every page load. */
@@ -32,7 +32,12 @@ export const visibility = {
    * Wedding-day timeline on the home page. Keep this off until the times in
    * `timeline.events` are real — the placeholders below are guesses.
    */
-  showTimeline: false,
+  showTimeline: true,
+  /**
+   * Relationship scrapbook on the home page. Keep this off until real photos
+   * and captions are in place.
+   */
+  showScrapbook: true,
 } as const
 
 export const envelope = {
@@ -48,6 +53,9 @@ export const home = {
   eyebrow: 'The wedding of',
   welcomeTitle: 'You are invited',
   welcomeBody: `We're so glad you're here. This little corner of the internet is where you'll find everything you need for our wedding day — how to RSVP, answers to common questions, and (soon) all the details once we've locked them in.`,
+  /** Describes the save-the-date artwork for screen readers. */
+  artAlt:
+    "Line drawing of Riley and Lexi's cats and dogs around a champagne tower — save the date, Riley and Lexi are getting married on 02.10.2027, formal invitation to follow",
   signOff: 'With all our love,',
   formalNote: '',
 } as const
@@ -163,6 +171,99 @@ export const timeline = {
   ] satisfies TimelineEvent[] as TimelineEvent[],
 } as const
 
+export type ScrapbookPhoto = {
+  /**
+   * Matches the source filename in `photos/`, without its extension. So
+   * `photos/first-date.jpg` has the slug `first-date`. Slugs with no processed
+   * image yet render as an empty frame.
+   */
+  slug: string
+  /** Handwritten caption under the photo. */
+  caption: string
+  /** Shown small beside the caption. Any format you like. */
+  date?: string
+  /** Describes the photo for screen readers and if the image fails to load. */
+  alt: string
+}
+
+/**
+ * Photos from throughout our relationship, shown as a scrapbook.
+ *
+ * To add photos: drop the originals into `photos/`, run `npm run art:photos`,
+ * then list them here by slug. Sizes and formats are handled by that script.
+ */
+export const scrapbook = {
+  title: 'Our Story',
+  intro: 'A few of our favourite moments on the way to this one.',
+  /** Optional caveat under the heading. Set to '' when the photos are real. */
+  note: '',
+  /** Shown on the frames that have no photo behind them yet. */
+  emptyLabel: 'Photo coming soon',
+
+  /** How many photos sit on each page of the book. */
+  perPage: 2,
+
+  /** Hint that the book turns as you scroll, shown on the first page. */
+  scrollHint: 'Keep scrolling to turn the page',
+
+  /** The last page of the book, after all the photos. */
+  closing: {
+    line: 'and the next chapter starts',
+    date: 'October 2, 2027',
+  },
+
+  /** Controls for guests who would rather click than scroll. */
+  controls: {
+    previous: 'Previous page',
+    next: 'Next page',
+  },
+
+  photos: [
+    {
+      slug: 'Christmas_2019',
+      caption: 'Christmas',
+      date: 'December 25th, 2019',
+      alt: 'Christmas photo of Riley and Lexi',
+    },
+    {
+      slug: 'Covid_Highschool',
+      caption: 'In Highschool during covid',
+      date: 'June 23rd, 2021',
+      alt: 'In Highschool during covid photo of Riley and Lexi',
+    },
+    {
+      slug: 'The_Arches_230522',
+      caption: 'The Arches',
+      date: 'May 23rd, 2022',
+      alt: 'The Arches photo of Riley and Lexi',
+    },
+    {
+      slug: 'Grad_23',
+      caption: 'Graduation',
+      date: 'June 23rd, 2023',
+      alt: 'Graduation photo of Riley and Lexi',
+    },
+    {
+      slug: 'Lexis_18_24',
+      caption: 'Lexis 18th Birthday',
+      date: 'March 23th, 2024',
+      alt: 'Lexis 18th Birthday photo of Riley and Lexi',
+    },
+    {
+      slug: 'Kayaking',
+      caption: 'Kayaking',
+      date: 'July 9th, 2025',
+      alt: 'Kayaking photo of Riley and Lexi',
+    },
+    {
+      slug: 'Engaged_Photo',
+      caption: 'ENGAGED!',
+      date: 'August 22nd, 2026',
+      alt: 'Engagement photo of Riley and Lexi',
+    },
+  ] satisfies ScrapbookPhoto[] as ScrapbookPhoto[],
+} as const
+
 export type FaqItem = { question: string; answer: string }
 
 export type FaqSection = {
@@ -207,12 +308,12 @@ export const faq: FaqSection[] = [
       {
         question: 'Who can I contact with questions?',
         answer:
-          'Reach out to Riley or Lexi directly — we\'re happy to help. you can also Email us at landrwedding27@gmail.com and we will get back to you as soon as possible.',
+          'Reach out to Riley or Lexi directly — we\'re happy to help. You can also email us at landrwedding27@gmail.com and we will get back to you as soon as possible.',
       },
       {
         question: 'Can I take photos during the Ceremony?',
         answer:
-          'We kindly as guests to refrain from taking photos during the Ceremony so everyone can remain fully present. Plenty of time for photos after the Ceremony.',
+          'We kindly ask guests to refrain from taking photos during the Ceremony so everyone can remain fully present. Plenty of time for photos after the Ceremony.',
       }
     ],
   },
@@ -249,12 +350,80 @@ export const weddingParty = {
   groomsmen: [] as PartyMember[],
 }
 
+/**
+ * Everything the RSVP page says.
+ *
+ * Guests find themselves by name first, so the page has three parts: the name
+ * lookup, the reply itself, and a plain form for anyone the list cannot place.
+ * The guest list lives in the Google Sheet, never here.
+ */
 export const rsvpCopy = {
   title: 'Kindly Respond',
-  submitLabel: 'RSVP',
   successTitle: 'Thank you!',
   successBody:
     "We've received your response. We can't wait to celebrate with you — or we'll miss you if you can't make it.",
   errorBody:
     'Something went wrong sending your RSVP. Please try again in a moment, or message us directly.',
-}
+  backLabel: '← Go back',
+
+  /** Finding yourself on the list. */
+  lookup: {
+    intro: 'Enter your name and we’ll find you on our list.',
+    label: 'Your name',
+    placeholder: 'First and last name',
+    submitLabel: 'Find me',
+    checkingLabel: 'Looking…',
+    missing: 'Please enter your name.',
+    notFound:
+      "We couldn't find that name on our list. Check the spelling, try the name we'd have written on the envelope — or reply below and we'll match you up.",
+    /** When a name could be more than one guest. */
+    ambiguous:
+      'There’s more than one of you on our list! Please enter your first and last name.',
+    busy: 'We’re a little busy just now. Please try again in a minute.',
+    /** The way out for anyone the list cannot place. */
+    noCodeLabel: 'Name not on the list?',
+    noCodeBody:
+      'We may have written it differently, or spelled it wrong. Reply here and we’ll sort it out.',
+    noCodeCta: 'Reply without looking up',
+  },
+
+  /** Replying once they have been found. */
+  reply: {
+    /** `{name}` is replaced with the name on the list. */
+    welcome: 'Hello, {name}',
+    intro: 'Please let us know if you can join us.',
+    /** Shown instead of the intro when they have already replied. */
+    amendIntro: 'You’ve replied already — change anything you like and send it again.',
+    submitLabel: 'Send my reply',
+    updateLabel: 'Update my reply',
+    sendingLabel: 'Sending…',
+    attendingLabel: 'I can attend',
+    notAttendingLabel: 'I can’t attend',
+    unanswered: 'Please let us know if you can attend.',
+    plusOneLabel: 'Name of the guest you’re bringing',
+    plusOneHint: 'You’re welcome to bring a guest. Leave blank if you’d rather not.',
+    dietaryLabel: 'Dietary needs or allergies',
+    dietaryPlaceholder: 'e.g. Vegetarian, nut allergy, or “None”',
+    noteLabel: 'Anything you’d like to tell us (optional)',
+    startOver: 'This isn’t me',
+  },
+
+  /** The plain form, for guests the list could not place. */
+  open: {
+    intro:
+      'Tell us who you are and we’ll match you up ourselves. If you’re bringing anyone, let us know below.',
+    nameLabel: 'Your full name',
+    nameMissing: 'Please enter your full name.',
+    attendingLabel: 'Will you be attending?',
+    attendingYes: "Yes, wouldn't miss it",
+    attendingNo: "Sorry, can't make it",
+    attendingMissing: 'Please let us know if you can attend.',
+    plusOneLabel: 'Bringing anyone with you? (optional)',
+    plusOnePlaceholder: 'Their name',
+    dietaryLabel: 'Dietary needs or allergies',
+    dietaryPlaceholder: 'e.g. Vegetarian, nut allergy, or “None”',
+    noteLabel: 'Anything you’d like to tell us (optional)',
+    submitLabel: 'Send my reply',
+    haveCode: 'Look up my name instead',
+  },
+} as const

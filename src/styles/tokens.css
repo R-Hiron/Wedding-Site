@@ -12,10 +12,18 @@
   --color-white: #fffcf7;
   --color-border: #3d2c22;
 
+  /* Leather binding on the scrapbook */
+  --color-leather: #4a3226;
+  --color-leather-dark: #32211a;
+  --color-leather-light: #5e4130;
+  --color-stitch: #cbb896;
+
   /* Type */
   --font-script: 'Great Vibes', cursive;
   --font-serif: 'Cormorant Garamond', 'Times New Roman', serif;
   --font-sans: 'Montserrat', system-ui, sans-serif;
+  /* Marker-style handwriting for scrapbook captions. */
+  --font-hand: 'Caveat', 'Segoe Script', cursive;
 
   /* Spacing */
   --space-xs: 0.5rem;

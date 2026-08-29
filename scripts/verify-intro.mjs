@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer-core'
 
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
-const BASE = 'http://localhost:5174/'
+const BASE = process.env.SITE_URL ?? 'http://localhost:5173/'
 
 const results = []
 function check(name, pass, detail = '') {

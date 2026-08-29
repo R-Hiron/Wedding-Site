@@ -15,10 +15,91 @@
   margin: 0 auto var(--space-lg);
 }
 
+.rsvp__intro {
+  color: var(--color-ink-soft);
+  margin: 0;
+}
+
 .rsvp-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+}
+
+.rsvp-form ::placeholder {
+  color: var(--color-ink-soft);
+  opacity: 0.5;
+}
+
+/* Who we found on the list. */
+.rsvp__found {
+  text-align: center;
+}
+
+.rsvp__found-name {
+  font-size: clamp(1.75rem, 6vw, 2.4rem);
+  margin: 0 0 var(--space-sm);
+}
+
+.rsvp__found .rsvp__intro {
+  max-width: 26rem;
+  margin-inline: auto;
+}
+
+.rsvp-form__hint {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--color-ink-soft);
+}
+
+/* Two answers that fit side by side once there is room. */
+@media (min-width: 30rem) {
+  .rsvp-form__choices.rsvp-form__choices--pair {
+    flex-direction: row;
+  }
+
+  .rsvp-form__choices--pair .rsvp-choice {
+    flex: 1 1 0;
+    text-align: center;
+  }
+}
+
+/* The way out for guests without a code, and other quiet actions. */
+.rsvp__aside {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-taupe-hover);
+  text-align: center;
+}
+
+.rsvp__aside-title {
+  font-size: 0.65rem;
+  margin: 0 0 var(--space-xs);
+  color: var(--color-ink);
+}
+
+.rsvp__aside-body {
+  color: var(--color-ink-soft);
+  font-size: 0.95rem;
+  max-width: 24rem;
+  margin: 0 auto var(--space-sm);
+}
+
+.rsvp__link {
+  background: none;
+  border: none;
+  padding: 0.4rem;
+  font-size: 0.65rem;
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+  align-self: center;
+  transition: color var(--transition);
+}
+
+.rsvp__link:hover {
+  color: var(--color-ink);
 }
 
 .rsvp-form__field {
@@ -65,29 +146,35 @@
   gap: 0.55rem;
 }
 
+/*
+ * The chosen answer is the filled one. Filling the unchosen answers instead
+ * reads backwards, especially with two side by side.
+ */
 .rsvp-choice {
   font-family: var(--font-serif);
   font-size: 1.05rem;
   text-align: left;
   padding: 0.9rem 1rem;
-  background: var(--color-taupe);
+  background: var(--color-white);
   color: var(--color-ink);
-  border: 1px solid transparent;
+  border: 1px solid var(--color-taupe-hover);
   border-radius: var(--radius);
   cursor: pointer;
   transition:
     background var(--transition),
-    border-color var(--transition);
+    border-color var(--transition),
+    color var(--transition);
 }
 
 .rsvp-choice:hover {
-  background: var(--color-taupe-hover);
+  background: var(--color-taupe);
 }
 
+/* Ink rather than olive, since the same style says both yes and no. */
 .rsvp-choice.is-selected {
-  background: var(--color-cream);
+  background: var(--color-ink);
   border-color: var(--color-ink);
-  box-shadow: inset 0 0 0 1px var(--color-ink);
+  color: var(--color-cream);
 }
 
 .rsvp-form__error {

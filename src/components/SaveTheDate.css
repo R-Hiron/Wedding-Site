@@ -1,0 +1,10 @@
+.stod {
+  width: min(100%, 22rem);
+  margin: var(--space-lg) auto var(--space-md);
+}
+
+.stod__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

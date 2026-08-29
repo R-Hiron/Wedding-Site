@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer-core'
 
 const CHROME = 'C:/Program Files/Google/Chrome/Application/chrome.exe'
-const BASE = 'http://localhost:5174/'
+const BASE = process.env.SITE_URL ?? 'http://localhost:5173/'
 
 const results = []
 function check(name, pass, detail = '') {
@@ -50,11 +50,38 @@ const state = (page) =>
       dashoffset: parseFloat(drawn.style.strokeDashoffset || '0'),
       dasharray: drawn.style.strokeDasharray,
       revealed: items.map((el) => el.classList.contains('is-revealed')),
-      dotX: items.map((el) => {
-        const r = el.querySelector('.timeline__dot').getBoundingClientRect()
+      stopX: items.map((el) => {
+        const r = el.querySelector('.timeline__stop').getBoundingClientRect()
         return Math.round(r.left + r.width / 2)
       }),
+      routeWidth: Math.round(route.getBoundingClientRect().width),
+      // Every stop should carry an illustration, not just a dot.
+      scenes: items.map((el) => !!el.querySelector('.timeline__stop .ms')),
+      cardWidth: Math.min(
+        ...items.map((el) => Math.round(el.querySelector('.timeline__card').getBoundingClientRect().width)),
+      ),
     }
+  })
+
+/**
+ * Which scene parts are actually being animated. Movement is gated on a
+ * milestone being revealed, so this is also how we check nothing is animating
+ * off-screen.
+ */
+const moving = (page) =>
+  page.evaluate(() => {
+    const parts = [...document.querySelectorAll('.timeline__stop .ms *')]
+    return parts.filter((el) => getComputedStyle(el).animationName !== 'none').length
+  })
+
+/** How much scrolling it takes to draw the route from start to finish. */
+const drawDistance = (page) =>
+  page.evaluate(() => {
+    const box = document.querySelector('.timeline__route').getBoundingClientRect()
+    const top = box.top + window.scrollY
+    const start = top - window.innerHeight * 0.85
+    const end = top + box.height - window.innerHeight
+    return Math.round(end - start)
   })
 
 // --- Desktop -----------------------------------------------------------------
@@ -69,8 +96,29 @@ check('scroll animation is active', initial.animating)
 check('line starts undrawn', initial.dashoffset > 0, `offset ${Math.round(initial.dashoffset)}`)
 check('no milestones revealed before scrolling', !initial.revealed.some(Boolean))
 
-const uniqueX = new Set(initial.dotX)
-check('milestones alternate horizontally to wind the route', uniqueX.size > 1, `x: ${[...uniqueX].join(', ')}`)
+const uniqueX = new Set(initial.stopX)
+check('stops alternate horizontally to wind the route', uniqueX.size > 1, `x: ${[...uniqueX].join(', ')}`)
+
+// The point of the design: the route should cross most of the section, not
+// wobble around the middle.
+const spread = Math.max(...initial.stopX) - Math.min(...initial.stopX)
+check(
+  'the route swings from one side to the other',
+  spread > initial.routeWidth * 0.45,
+  `${spread}px across a ${initial.routeWidth}px section`,
+)
+
+check('every stop carries an illustration', initial.scenes.every(Boolean))
+check('the illustrations hold still until their stop is reached', (await moving(page)) === 0)
+
+// Slow enough that a guest is not racing the line down the page, measured in
+// screenfuls so the number means something at any viewport size.
+const distance = await drawDistance(page)
+check(
+  'the route takes an unhurried amount of scrolling to draw',
+  distance > 860 * 1.6,
+  `${(distance / 860).toFixed(1)} screens for ${initial.revealed.length} stops`,
+)
 
 // Scroll through the section and watch the line draw and milestones appear.
 const samples = []
@@ -99,8 +147,17 @@ check('milestones reveal in order as the line reaches them', counts.every((v, i)
 check('every milestone is revealed by the end', counts.at(-1) === samples[0].revealed.length, `${counts.at(-1)}/${samples[0].revealed.length}`)
 check('line is fully drawn by the end', offsets.at(-1) < 1, `offset ${Math.round(offsets.at(-1))}`)
 
-// Nothing may pin or hijack the scroll position.
-const pinned = await page.evaluate(() => !!document.querySelector('.pin-spacer'))
+const animated = await moving(page)
+check('the illustrations come to life once revealed', animated > 20, `${animated} moving parts`)
+
+// The timeline may not pin or hijack the scroll position. Scoped to this
+// section, because the scrapbook above it pins on purpose to turn its pages.
+const pinned = await page.evaluate(() => {
+  const timeline = document.querySelector('.timeline')
+  return (
+    !!timeline.closest('.pin-spacer') || !!timeline.querySelector('.pin-spacer')
+  )
+})
 check('no scroll-jacking or pinning', !pinned)
 
 // --- Mobile ------------------------------------------------------------------
@@ -109,8 +166,28 @@ await mobile.setViewport({ width: 400, height: 780 })
 await openHome(mobile)
 const mobileState = await state(mobile)
 check('mobile route generated', mobileState.d.includes('C'))
-const mobileSpread = Math.max(...mobileState.dotX) - Math.min(...mobileState.dotX)
-check('mobile route stays mostly vertical', mobileSpread > 0 && mobileSpread < 40, `spread ${mobileSpread}px`)
+
+const mobileSpread = Math.max(...mobileState.stopX) - Math.min(...mobileState.stopX)
+check(
+  'mobile route winds side to side too',
+  mobileSpread > 80,
+  `spread ${mobileSpread}px of ${mobileState.routeWidth}px`,
+)
+// But not at the cost of the schedule itself — swinging the stops out squeezes
+// the text, and unreadably narrow cards would be a poor trade.
+check(
+  'mobile cards stay wide enough to read',
+  mobileState.cardWidth >= 200,
+  `narrowest card ${mobileState.cardWidth}px`,
+)
+check('mobile stops carry illustrations', mobileState.scenes.every(Boolean))
+
+const mobileDistance = await drawDistance(mobile)
+check(
+  'mobile also draws unhurriedly',
+  mobileDistance > 780 * 1.4,
+  `${(mobileDistance / 780).toFixed(1)} screens`,
+)
 
 // --- Reduced motion ----------------------------------------------------------
 const rm = await browser.newPage()
@@ -121,6 +198,7 @@ const rmState = await state(rm)
 check('reduced motion shows the whole schedule at once', rmState.revealed.every(Boolean))
 check('reduced motion leaves the route fully drawn', rmState.dashoffset === 0 && rmState.dasharray === 'none')
 check('reduced motion does not hide milestones', !rmState.animating)
+check('reduced motion leaves the illustrations still', (await moving(rm)) === 0)
 
 // --- Without JavaScript ------------------------------------------------------
 const noJs = await browser.newPage()

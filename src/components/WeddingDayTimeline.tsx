@@ -3,7 +3,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { timeline } from '../content'
 import { prefersReducedMotion } from '../lib/introSession'
-import { MilestoneIcon } from './MilestoneIcon'
+import { MilestoneScene } from './MilestoneScene'
 import './WeddingDayTimeline.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -11,22 +11,30 @@ gsap.registerPlugin(ScrollTrigger)
 type Point = { x: number; y: number }
 
 /** Straight run added before the first and after the last milestone. */
-const LEAD = 36
+const LEAD = 52
+
+/**
+ * How far each bend is drawn out, as a fraction of the vertical gap between two
+ * stops. The stops sit near opposite edges, so this is what turns the long
+ * horizontal jumps between them into lazy S-curves instead of diagonals.
+ */
+const BEND = 0.62
 
 /**
  * Fraction of the scroll range by which the route has finished drawing. Leaving
  * headroom means the final milestone appears while it is still comfortably in
  * view, rather than only once the section has been scrolled fully past.
  */
-const DRAWN_BY = 0.9
+const DRAWN_BY = 0.88
 
 /**
  * The wedding-day schedule drawn as a winding illustrated route.
  *
- * The route is generated from the measured positions of the milestone dots
- * rather than a hand-drawn path, so it always joins the milestones exactly at
- * any width, and the length at which each milestone is reached can be measured
- * precisely enough to reveal it as the line arrives.
+ * The route is generated from the measured positions of the stops rather than a
+ * hand-drawn path, so it always joins them exactly at any width, and the length
+ * at which each stop is reached can be measured precisely enough to reveal it as
+ * the line arrives. The stops sit near alternating edges of the section, so the
+ * generated route sweeps from one side to the other between them.
  *
  * Milestones are visible by default and only hidden once the scroll animation
  * is actually running, so the schedule stays readable without JavaScript, and
@@ -56,10 +64,10 @@ export function WeddingDayTimeline() {
     function layout() {
       const routeBox = route!.getBoundingClientRect()
       const points: Point[] = items.map((item) => {
-        const dot = item.querySelector('.timeline__dot')!.getBoundingClientRect()
+        const stop = item.querySelector('.timeline__stop')!.getBoundingClientRect()
         return {
-          x: dot.left - routeBox.left + dot.width / 2,
-          y: dot.top - routeBox.top + dot.height / 2,
+          x: stop.left - routeBox.left + stop.width / 2,
+          y: stop.top - routeBox.top + stop.height / 2,
         }
       })
 
@@ -88,7 +96,7 @@ export function WeddingDayTimeline() {
       // route unfinished and the final milestone hidden.
       trigger = ScrollTrigger.create({
         trigger: route!,
-        start: 'top 80%',
+        start: 'top 85%',
         end: 'bottom bottom',
         onUpdate: (self) => {
           const length = total * Math.min(1, self.progress / DRAWN_BY)
@@ -143,9 +151,10 @@ export function WeddingDayTimeline() {
                 itemRefs.current[i] = el
               }}
             >
-              <span className="timeline__dot" aria-hidden="true" />
+              <span className="timeline__stop" aria-hidden="true">
+                <MilestoneScene icon={event.icon} />
+              </span>
               <div className="timeline__card">
-                <MilestoneIcon icon={event.icon} />
                 {event.time ? <p className="timeline__time sans-caps">{event.time}</p> : null}
                 <h3 className="timeline__event serif-caps">{event.title}</h3>
                 {event.description ? (
@@ -161,11 +170,13 @@ export function WeddingDayTimeline() {
 }
 
 /**
- * Builds a smooth path through the milestone points and measures how far along
- * it each milestone sits.
+ * Builds a smooth path through the stops and measures how far along it each one
+ * sits.
  *
- * Control points are offset vertically only, which turns the alternating
- * milestone positions into gentle S-curves rather than corners.
+ * Control points are offset vertically only. That leaves each stop travelling
+ * straight down before it swings across to the next, which reads as a road
+ * rather than a zig-zag, and keeps the curve inside the horizontal span of the
+ * two stops it joins so it can never wander off the section.
  */
 function buildRoute(points: Point[], svg: SVGSVGElement) {
   const first = points[0]
@@ -188,7 +199,7 @@ function buildRoute(points: Point[], svg: SVGSVGElement) {
   for (let i = 1; i < points.length; i++) {
     const from = points[i - 1]
     const to = points[i]
-    const bend = (to.y - from.y) * 0.5
+    const bend = (to.y - from.y) * BEND
     d += ` C ${from.x} ${from.y + bend}, ${to.x} ${to.y - bend}, ${to.x} ${to.y}`
     reachedAt.push(lengthOf(d))
   }

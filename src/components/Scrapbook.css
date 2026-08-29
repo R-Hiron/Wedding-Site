@@ -1,0 +1,766 @@
+.scrapbook {
+  position: relative;
+  isolation: isolate;
+  padding: var(--space-xl) var(--space-sm) var(--space-2xl);
+  background: var(--color-cream-dark);
+  text-align: center;
+}
+
+/* Paper grain. Generated noise rather than an image request. */
+.scrapbook::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23p)' opacity='0.16'/%3E%3C/svg%3E");
+}
+
+.scrapbook__title {
+  margin: 0 0 var(--space-sm);
+  font-size: clamp(2.25rem, 7vw, 3.25rem);
+}
+
+.scrapbook__intro {
+  width: min(100%, 30rem);
+  margin: 0 auto var(--space-xs);
+  color: var(--color-ink-soft);
+}
+
+.scrapbook__note {
+  margin: 0 0 var(--space-lg);
+  font-size: 0.55rem;
+  color: var(--color-ink-soft);
+  opacity: 0.75;
+}
+
+/* --- The book ------------------------------------------------------------- */
+
+/*
+ * The stage is what gets pinned while the pages turn, so it fills the viewport
+ * and centres the book within it.
+ */
+.scrapbook__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  /* Exactly one viewport tall while pinned, with the top kept clear of the
+     sticky site header. */
+  min-height: 100vh;
+  padding-block: 3.5rem 1rem;
+  perspective: 2200px;
+}
+
+.book {
+  position: relative;
+  transform-style: preserve-3d;
+}
+
+.book--spread {
+  width: min(94vw, 58rem);
+  aspect-ratio: 3 / 2;
+}
+
+.book--single {
+  width: min(86vw, 24rem);
+  aspect-ratio: 3 / 4;
+}
+
+/*
+ * The leather binding. It sits a little outside the pages so it reads as a
+ * cover the paper is bound into, and is pushed back in 3D rather than ordered
+ * by z-index, since the turning sheets share a 3D space with it.
+ */
+.book {
+  /* Leather visible between the two page blocks, and around the outside. */
+  --gutter: 0.45rem;
+  --binding: 1.1rem;
+}
+
+.book__cover {
+  position: absolute;
+  inset: calc(-1 * var(--binding));
+  transform: translateZ(-3px);
+  border-radius: 0.45rem;
+}
+
+/* Paper showing through beneath the leaves, at the start and the end. */
+.book__paper {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transform: translateZ(-1px);
+  background: var(--color-white);
+  box-shadow: inset 0 0 3rem rgb(61 44 34 / 0.08);
+}
+
+.book--spread .book__paper--left {
+  left: 0;
+  width: calc(50% - var(--gutter));
+  border-radius: 3px 0 0 3px;
+}
+
+.book--spread .book__paper--right {
+  left: calc(50% + var(--gutter));
+  width: calc(50% - var(--gutter));
+  border-radius: 0 3px 3px 0;
+}
+
+/* A single page has no facing sheet, so one backing covers the whole book. */
+.book--single .book__paper--left {
+  left: 0;
+  width: 100%;
+  border-radius: 3px;
+}
+
+.book--single .book__paper--right {
+  display: none;
+}
+
+.book__spine {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2.1rem;
+  height: 100%;
+  transform: translateX(-50%);
+  /* Shadow either side of the fold, which also sinks the leather showing
+     through the gutter so it reads as a recessed channel. */
+  background: linear-gradient(
+    to right,
+    rgb(61 44 34 / 0) 0%,
+    rgb(61 44 34 / 0.16) 40%,
+    rgb(61 44 34 / 0.34) 50%,
+    rgb(61 44 34 / 0.16) 60%,
+    rgb(61 44 34 / 0) 100%
+  );
+  pointer-events: none;
+}
+
+.book--single .book__spine {
+  display: none;
+}
+
+/* --- A turning sheet ------------------------------------------------------ */
+
+.leaf {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  /* The turn itself is written by script from the scroll position. */
+  will-change: transform;
+}
+
+.book--spread .leaf {
+  left: 50%;
+  width: 50%;
+}
+
+.book--single .leaf {
+  left: 0;
+  width: 100%;
+}
+
+.leaf__face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  background: var(--color-white);
+  overflow: hidden;
+}
+
+/*
+ * The sheet still hinges exactly on the centre line, so a turned page lands
+ * squarely on the left. Insetting the printed face instead is what opens the
+ * leather gutter without knocking the two halves out of alignment.
+ */
+.book--spread .leaf__face {
+  left: var(--gutter);
+}
+
+.book--spread .leaf__face--front {
+  border-radius: 0 3px 3px 0;
+  box-shadow: 2px 2px 12px rgb(61 44 34 / 0.12);
+}
+
+/* Mirrored by the flip, so its rounded corners are written back to front. */
+.book--spread .leaf__face--back {
+  border-radius: 0 3px 3px 0;
+  box-shadow: 2px 2px 12px rgb(61 44 34 / 0.12);
+}
+
+.book--single .leaf__face {
+  border-radius: 3px;
+  box-shadow: 0 2px 14px rgb(61 44 34 / 0.16);
+}
+
+.leaf__face--back {
+  transform: rotateY(180deg);
+}
+
+/* --- A page's contents ---------------------------------------------------- */
+
+.sheet {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: clamp(0.75rem, 2.5vw, 1.75rem);
+}
+
+.sheet--closing {
+  display: grid;
+  place-content: center;
+  gap: 0.25rem;
+}
+
+.sheet__closing-line {
+  margin: 0;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  color: var(--color-ink-soft);
+}
+
+.sheet__closing-date {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 2.75rem);
+  color: var(--color-chocolate);
+}
+
+/*
+ * Four quarters, filled in reading order, so a cell's place on the page comes
+ * from its position in the markup and needs no per-child placement rules.
+ */
+.sheet__slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  width: 100%;
+  height: 100%;
+  gap: 0.5rem;
+}
+
+/* The inset gives each tilted print room to lean without clipping. */
+.sheet__slot {
+  min-height: 0;
+  min-width: 0;
+  padding: 7%;
+}
+
+.sheet__slot--keepsake {
+  display: grid;
+  place-items: center;
+  padding: 9%;
+}
+
+/* --- Keepsakes ------------------------------------------------------------ */
+
+/*
+ * Faint enough to read as something tucked onto the page rather than another
+ * subject on it. Strokes are kept at a constant width on screen, so a keepsake
+ * scaled down for a phone is drawn with the same pen as one on a wide screen.
+ */
+.keepsake {
+  display: block;
+  color: var(--color-ink);
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.keepsake svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.keepsake svg * {
+  vector-effect: non-scaling-stroke;
+}
+
+.k-perforated {
+  stroke-dasharray: 2 3;
+}
+
+/* Widths are per keepsake, so a tall sprig and a wide ticket both sit
+   comfortably inside the same square-ish corner of a page. */
+.keepsake--heart {
+  width: 42%;
+}
+.keepsake--arrow {
+  width: 76%;
+}
+.keepsake--sparkle {
+  width: 40%;
+}
+.keepsake--sprig {
+  width: 46%;
+}
+.keepsake--ticket {
+  width: 82%;
+}
+.keepsake--stamp {
+  width: 54%;
+}
+.keepsake--paw {
+  width: 46%;
+}
+.keepsake--clip {
+  width: 26%;
+}
+.keepsake--pin {
+  width: 42%;
+}
+.keepsake--note {
+  width: 72%;
+}
+
+/* Nothing sits perfectly square on a scrapbook page. */
+.keepsake[data-lean='0'] {
+  rotate: -7deg;
+}
+.keepsake[data-lean='1'] {
+  rotate: 5deg;
+}
+.keepsake[data-lean='2'] {
+  rotate: -3deg;
+}
+.keepsake[data-lean='3'] {
+  rotate: 9deg;
+}
+
+/* The ones that are meant to look pasted on get paper under them. */
+.keepsake--paper {
+  padding: 5%;
+  background: var(--color-cream);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 1px rgb(61 44 34 / 0.1),
+    0 4px 10px rgb(61 44 34 / 0.1);
+  opacity: 1;
+}
+
+.keepsake--paper svg {
+  opacity: 0.4;
+}
+
+/* --- Keepsakes on the pages that hold no photos --------------------------- */
+
+/* The pairing sheet: a scatter, as though things were slipped in loose. */
+.sheet__scrap {
+  position: absolute;
+  display: block;
+}
+
+.sheet__scrap--a {
+  top: 8%;
+  left: 12%;
+  width: 22%;
+}
+
+.sheet__scrap--b {
+  top: 22%;
+  right: 8%;
+  width: 34%;
+}
+
+.sheet__scrap--c {
+  top: 48%;
+  left: 22%;
+  width: 20%;
+}
+
+.sheet__scrap--d {
+  bottom: 10%;
+  right: 18%;
+  width: 26%;
+}
+
+.sheet__scrap--e {
+  bottom: 26%;
+  left: 8%;
+  width: 12%;
+}
+
+/* Inside a scatter the width is set by the slot, not the keepsake. */
+.sheet__scrap .keepsake {
+  width: 100%;
+}
+
+.sheet--closing .keepsake {
+  justify-self: center;
+  width: 1.75rem;
+  margin-bottom: var(--space-sm);
+}
+
+/* A sprig either side of the closing line, the second a mirror of the first. */
+.sheet__flourish {
+  position: absolute;
+  top: 50%;
+  width: 14%;
+  translate: 0 -50%;
+}
+
+.sheet__flourish .keepsake {
+  width: 100%;
+  margin: 0;
+}
+
+.sheet__flourish--left {
+  left: 9%;
+}
+
+.sheet__flourish--right {
+  right: 9%;
+  scale: -1 1;
+}
+
+/* --- A single print ------------------------------------------------------- */
+
+/*
+ * A print fills its quarter of the page, and the photo area takes whatever
+ * height is left once the caption has had its share. Sizing the frame from the
+ * image instead would let a tall portrait photo push its caption off the page.
+ */
+.polaroid {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.polaroid__inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0.4rem 0.4rem 0.2rem;
+  background: var(--color-white);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 2px rgb(61 44 34 / 0.14),
+    0 6px 14px rgb(61 44 34 / 0.16);
+  transition: transform var(--transition);
+}
+
+/* Tape across one corner. */
+.polaroid__inner::before {
+  content: '';
+  position: absolute;
+  top: -0.4rem;
+  left: 50%;
+  width: 2.75rem;
+  height: 0.9rem;
+  transform: translateX(-50%) rotate(-4deg);
+  background: color-mix(in srgb, var(--color-taupe) 45%, transparent);
+  border-left: 1px dashed color-mix(in srgb, var(--color-ink) 12%, transparent);
+  border-right: 1px dashed color-mix(in srgb, var(--color-ink) 12%, transparent);
+  opacity: 0.7;
+}
+
+/* Natural variation, so no two prints sit at the same angle. */
+.polaroid[data-tilt='0'] .polaroid__inner {
+  transform: rotate(-2.2deg);
+}
+.polaroid[data-tilt='1'] .polaroid__inner {
+  transform: rotate(1.8deg);
+}
+.polaroid[data-tilt='2'] .polaroid__inner {
+  transform: rotate(-1.2deg);
+}
+.polaroid[data-tilt='3'] .polaroid__inner {
+  transform: rotate(2.6deg);
+}
+
+.polaroid[data-tilt='1'] .polaroid__inner::before,
+.polaroid[data-tilt='3'] .polaroid__inner::before {
+  left: 24%;
+  transform: translateX(-50%) rotate(6deg);
+}
+
+.polaroid__shot {
+  display: block;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: var(--color-cream-dark);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* Cropped to fill the frame. The lightbox shows the whole photo uncropped. */
+.polaroid__shot img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.polaroid__shot:not(.polaroid__shot--empty):hover img {
+  opacity: 0.92;
+}
+
+/* Holds a photo's shape before the reader gets close enough to load it. */
+.polaroid__pending {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: color-mix(in srgb, var(--color-taupe) 18%, transparent);
+}
+
+.polaroid__shot--empty {
+  display: grid;
+  place-items: center;
+  cursor: default;
+  color: var(--color-ink-soft);
+  background: repeating-linear-gradient(
+    45deg,
+    color-mix(in srgb, var(--color-taupe) 22%, transparent),
+    color-mix(in srgb, var(--color-taupe) 22%, transparent) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+}
+
+.polaroid__shot--empty span {
+  font-size: 0.45rem;
+  opacity: 0.7;
+}
+
+.polaroid__caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  padding: 0.3rem 0.1rem 0.15rem;
+  text-align: left;
+}
+
+.polaroid__text {
+  font-size: clamp(0.85rem, 1.6vw, 1.15rem);
+  line-height: 1.2;
+  color: var(--color-chocolate);
+}
+
+.polaroid__date {
+  font-size: clamp(0.7rem, 1.2vw, 0.95rem);
+  color: var(--color-ink-soft);
+  opacity: 0.8;
+}
+
+/* --- Controls ------------------------------------------------------------- */
+
+.book__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.book__arrow {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--color-chocolate);
+  background: var(--color-white);
+  border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    opacity var(--transition),
+    background var(--transition);
+}
+
+.book__arrow:hover:not(:disabled) {
+  background: var(--color-cream);
+}
+
+.book__arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.book__dots {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.book__dot {
+  display: block;
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    background var(--transition),
+    transform var(--transition);
+}
+
+.book__dot:hover {
+  background: color-mix(in srgb, var(--color-ink) 45%, transparent);
+}
+
+.book__dot.is-current {
+  background: var(--color-olive);
+  transform: scale(1.5);
+}
+
+.book__hint {
+  margin: 0;
+  font-size: 0.55rem;
+  color: var(--color-ink-soft);
+  opacity: 0.7;
+  animation: hint-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* --- Reduced motion: every page down the screen --------------------------- */
+
+.scrapbook__flat {
+  display: grid;
+  gap: var(--space-lg);
+  width: min(100%, 34rem);
+  margin: 0 auto;
+}
+
+.flat-page {
+  aspect-ratio: 3 / 4;
+  background: var(--color-white);
+  border-radius: 3px;
+  box-shadow: 0 2px 14px rgb(61 44 34 / 0.14);
+}
+
+/* A blank sheet only exists to make the book's pages pair up. */
+.scrapbook--flat .sheet--blank {
+  display: none;
+}
+
+.scrapbook--flat .flat-page:has(.sheet--blank) {
+  display: none;
+}
+
+/* --- Lightbox ------------------------------------------------------------- */
+
+.lightbox {
+  width: min(92vw, 60rem);
+  max-width: none;
+  max-height: 92vh;
+  padding: 0;
+  border: 0;
+  background: none;
+  overflow: visible;
+}
+
+.lightbox::backdrop {
+  background: rgb(42 36 31 / 0.82);
+}
+
+.lightbox__figure {
+  margin: 0;
+  padding: 0.9rem 0.9rem 0.5rem;
+  background: var(--color-white);
+  border-radius: 3px;
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.35);
+}
+
+.lightbox__image {
+  width: 100%;
+  height: auto;
+  max-height: 78vh;
+  object-fit: contain;
+}
+
+.lightbox__caption {
+  padding-top: 0.6rem;
+  font-size: 1.35rem;
+  color: var(--color-chocolate);
+  text-align: left;
+}
+
+.lightbox__date {
+  color: var(--color-ink-soft);
+}
+
+.lightbox__button {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--color-white);
+  background: rgb(0 0 0 / 0.45);
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.lightbox__button:hover {
+  background: rgb(0 0 0 / 0.7);
+}
+
+.lightbox__button--close {
+  top: -1.25rem;
+  right: -1.25rem;
+}
+
+.lightbox__button--prev {
+  top: 50%;
+  left: -1.25rem;
+  transform: translateY(-50%);
+}
+
+.lightbox__button--next {
+  top: 50%;
+  right: -1.25rem;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 30rem) {
+  .lightbox__button--close {
+    top: 0.25rem;
+    right: 0.25rem;
+  }
+
+  .lightbox__button--prev {
+    left: 0.25rem;
+  }
+
+  .lightbox__button--next {
+    right: 0.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .polaroid__inner {
+    transition-duration: 1ms;
+  }
+
+  .book__hint {
+    animation: none;
+  }
+}

@@ -1,0 +1,353 @@
+/*
+ * Movement for the illustrated stops on the wedding-day route.
+ *
+ * Everything here is small, slow and looping — enough to make each stop feel
+ * alive without pulling attention off the schedule itself. Animations are gated
+ * on `.is-revealed`, so a scene only starts once the drawn route has reached it,
+ * and the whole file is wrapped in a reduced-motion guard.
+ */
+
+.ms {
+  width: 100%;
+  height: 100%;
+  color: var(--color-olive);
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  overflow: visible;
+}
+
+/* Resting positions, so the art still reads when nothing is moving. */
+.ms-glass {
+  transform-box: view-box;
+}
+
+.ms-glass--left {
+  transform-origin: 34px 74px;
+  transform: rotate(-13deg);
+}
+
+.ms-glass--right {
+  transform-origin: 62px 74px;
+  transform: rotate(13deg);
+}
+
+.ms-glint,
+.ms-bubble,
+.ms-steam,
+.ms-note,
+.ms-confetti {
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* --- Petals through the arch --- */
+  .ms-petal {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+  }
+
+  .timeline__item.is-revealed .ms-petal {
+    animation: ms-fall 5.2s ease-in infinite;
+  }
+
+  .timeline__item.is-revealed .ms-petal--b {
+    animation-duration: 6.4s;
+    animation-delay: 1.4s;
+  }
+
+  .timeline__item.is-revealed .ms-petal--c {
+    animation-duration: 5.8s;
+    animation-delay: 2.8s;
+  }
+
+  @keyframes ms-fall {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 0;
+    }
+    18% {
+      opacity: 0.85;
+    }
+    75% {
+      opacity: 0.85;
+    }
+    100% {
+      transform: translate(-7px, 40px) rotate(150deg);
+      opacity: 0;
+    }
+  }
+
+  /* --- Rings settling together --- */
+  .ms-ring {
+    transform-box: view-box;
+  }
+
+  .timeline__item.is-revealed .ms-ring--left {
+    animation: ms-ring-left 6s ease-in-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-ring--right {
+    animation: ms-ring-right 6s ease-in-out infinite;
+  }
+
+  @keyframes ms-ring-left {
+    0%,
+    100% {
+      transform: translateX(-5px);
+    }
+    50% {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes ms-ring-right {
+    0%,
+    100% {
+      transform: translateX(5px);
+    }
+    50% {
+      transform: translateX(0);
+    }
+  }
+
+  .ms-glint {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  .timeline__item.is-revealed .ms-glint {
+    animation: ms-glint 4.4s ease-in-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-glint--b {
+    animation-delay: 2.2s;
+  }
+
+  @keyframes ms-glint {
+    0%,
+    70%,
+    100% {
+      opacity: 0.2;
+      scale: 0.7;
+    }
+    35% {
+      opacity: 0.9;
+      scale: 1.05;
+    }
+  }
+
+  /* --- Glasses meeting for a clink --- */
+  .timeline__item.is-revealed .ms-glass--left {
+    animation: ms-clink-left 4.8s ease-in-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-glass--right {
+    animation: ms-clink-right 4.8s ease-in-out infinite;
+  }
+
+  @keyframes ms-clink-left {
+    0%,
+    100% {
+      transform: rotate(-13deg);
+    }
+    45%,
+    60% {
+      transform: rotate(-3deg);
+    }
+  }
+
+  @keyframes ms-clink-right {
+    0%,
+    100% {
+      transform: rotate(13deg);
+    }
+    45%,
+    60% {
+      transform: rotate(3deg);
+    }
+  }
+
+  .ms-bubble {
+    transform-box: fill-box;
+    opacity: 0;
+  }
+
+  .timeline__item.is-revealed .ms-bubble {
+    animation: ms-rise 4.2s ease-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-bubble--b {
+    animation-duration: 5s;
+    animation-delay: 1.3s;
+  }
+
+  .timeline__item.is-revealed .ms-bubble--c {
+    animation-duration: 4.6s;
+    animation-delay: 2.6s;
+  }
+
+  @keyframes ms-rise {
+    0% {
+      transform: translateY(6px);
+      opacity: 0;
+    }
+    30% {
+      opacity: 0.7;
+    }
+    100% {
+      transform: translateY(-14px);
+      opacity: 0;
+    }
+  }
+
+  /* --- Dinner steaming --- */
+  .ms-steam {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    opacity: 0;
+  }
+
+  .timeline__item.is-revealed .ms-steam {
+    animation: ms-steam 5.4s ease-in-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-steam--b {
+    animation-duration: 6.2s;
+    animation-delay: 1.8s;
+  }
+
+  @keyframes ms-steam {
+    0% {
+      transform: translateY(6px) scaleY(0.75);
+      opacity: 0;
+    }
+    35% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-8px) scaleY(1.1);
+      opacity: 0;
+    }
+  }
+
+  /* --- The record turning, and the music off it --- */
+  .ms-record {
+    transform-box: view-box;
+    transform-origin: 44px 58px;
+  }
+
+  .timeline__item.is-revealed .ms-record {
+    animation: ms-spin 14s linear infinite;
+  }
+
+  @keyframes ms-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .ms-note {
+    transform-box: fill-box;
+    opacity: 0;
+  }
+
+  .timeline__item.is-revealed .ms-note {
+    animation: ms-note-rise 5s ease-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-note--b {
+    animation-duration: 5.8s;
+    animation-delay: 2.4s;
+  }
+
+  @keyframes ms-note-rise {
+    0% {
+      transform: translate(0, 8px) rotate(-6deg);
+      opacity: 0;
+    }
+    25% {
+      opacity: 0.75;
+    }
+    100% {
+      transform: translate(6px, -16px) rotate(8deg);
+      opacity: 0;
+    }
+  }
+
+  /* --- Lights and confetti --- */
+  .timeline__item.is-revealed .ms-bulb {
+    animation: ms-twinkle 3.6s ease-in-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-bulb--b {
+    animation-delay: 0.7s;
+  }
+
+  .timeline__item.is-revealed .ms-bulb--c {
+    animation-delay: 1.4s;
+  }
+
+  .timeline__item.is-revealed .ms-bulb--d {
+    animation-delay: 2.1s;
+  }
+
+  .timeline__item.is-revealed .ms-bulb--e {
+    animation-delay: 2.8s;
+  }
+
+  @keyframes ms-twinkle {
+    0%,
+    100% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  .ms-confetti {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+  }
+
+  .timeline__item.is-revealed .ms-confetti {
+    animation: ms-confetti 5.6s linear infinite;
+  }
+
+  .timeline__item.is-revealed .ms-confetti--b {
+    animation-duration: 6.8s;
+    animation-delay: 1.2s;
+  }
+
+  .timeline__item.is-revealed .ms-confetti--c {
+    animation-duration: 6.2s;
+    animation-delay: 2.6s;
+  }
+
+  .timeline__item.is-revealed .ms-confetti--d {
+    animation-duration: 7.4s;
+    animation-delay: 3.8s;
+  }
+
+  @keyframes ms-confetti {
+    0% {
+      transform: translate(0, -6px) rotate(0deg);
+      opacity: 0;
+    }
+    20% {
+      opacity: 0.75;
+    }
+    80% {
+      opacity: 0.75;
+    }
+    100% {
+      transform: translate(4px, 20px) rotate(220deg);
+      opacity: 0;
+    }
+  }
+}

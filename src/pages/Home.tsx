@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { couple, wedding, home, visibility, envelope } from '../content'
 import { Countdown } from '../components/Countdown'
 import { FloralCorners } from '../components/FloralCorners'
+import { SaveTheDate } from '../components/SaveTheDate'
+import { Scrapbook } from '../components/Scrapbook'
 import { WeddingDayTimeline } from '../components/WeddingDayTimeline'
 import { useIntro } from '../lib/introContext'
 import './Home.css'
@@ -19,11 +21,7 @@ export function Home() {
         {wedding.location ? (
           <p className="home-hero__location sans-caps">{wedding.location}</p>
         ) : null}
-        <img
-          className="home-hero__art"
-          src="/images/save-the-date.png"
-          alt="Line drawing of Riley and Lexi's pets around a champagne tower — save the date"
-        />
+        <SaveTheDate />
         {home.formalNote ? (
           <p className="home-hero__formal sans-caps">{home.formalNote}</p>
         ) : null}
@@ -52,6 +50,8 @@ export function Home() {
       </section>
 
       <Countdown />
+
+      {visibility.showScrapbook ? <Scrapbook /> : null}
 
       {visibility.showTimeline ? <WeddingDayTimeline /> : null}
     </div>

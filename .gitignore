@@ -15,6 +15,14 @@ dist-ssr
 .env.*
 !.env.example
 
+# Original scrapbook photos. Only the optimised copies that `npm run art:photos`
+# writes into public/images/scrapbook/ need to be committed and deployed, so the
+# full-resolution originals stay out of the repo.
+photos/
+
+# Screenshots taken while checking a page
+shot-*.png
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
