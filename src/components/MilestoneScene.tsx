@@ -51,6 +51,24 @@ const SCENES: Record<TimelineIcon, React.ReactNode> = {
     </>
   ),
 
+  // A camera finding its focus, with the flash going off above it.
+  photos: (
+    <>
+      <path d="M14 76 V41 A6 6 0 0 1 20 35 H33 L38 27 H58 L63 35 H76 A6 6 0 0 1 82 41 V70 A6 6 0 0 1 76 76 Z" />
+      <circle cx="48" cy="56" r="14" />
+      <circle className="ms-lens" cx="48" cy="56" r="8" opacity="0.3" />
+      <circle cx="72" cy="44" r="2.2" opacity="0.55" />
+      <path
+        className="ms-flash ms-flash--a"
+        d="M76 12 L78.6 19.4 L86 22 L78.6 24.6 L76 32 L73.4 24.6 L66 22 L73.4 19.4 Z"
+      />
+      <path
+        className="ms-flash ms-flash--b"
+        d="M20 16 L21.6 20.4 L26 22 L21.6 23.6 L20 28 L18.4 23.6 L14 22 L18.4 20.4 Z"
+      />
+    </>
+  ),
+
   // A pair of glasses leaning in for a clink, bubbles rising off them.
   cocktails: (
     <>

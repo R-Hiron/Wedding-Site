@@ -32,7 +32,7 @@ export const visibility = {
    * Wedding-day timeline on the home page. Keep this off until the times in
    * `timeline.events` are real — the placeholders below are guesses.
    */
-  showTimeline: false,
+  showTimeline: true,
   /**
    * Relationship scrapbook on the home page. Keep this off until real photos
    * and captions are in place.
@@ -105,6 +105,7 @@ export const countdown = {
 export type TimelineIcon =
   | 'arrival'
   | 'ceremony'
+  | 'photos'
   | 'cocktails'
   | 'dinner'
   | 'dance'
@@ -146,21 +147,21 @@ export const timeline = {
     },
     {
       time: '3:45 pm',
-      title: 'Cocktail hour',
-      description: 'Drinks and photos while we all catch our breath.',
+      title: 'Photos',
+      description: 'Photos of the couple and wedding party.',
+      icon: 'photos',
+    },
+    {
+      time: '5:00 pm',
+      title: 'Drinks and snacks',
+      description: 'Drinks and Appetizers.',
       icon: 'cocktails',
     },
     {
       time: '5:30 pm',
       title: 'Dinner',
-      description: 'Dinner, toasts, and probably a few happy tears.',
+      description: 'Dinner and dancing.',
       icon: 'dinner',
-    },
-    {
-      time: '7:30 pm',
-      title: 'First dance',
-      description: 'Our first dance as a married couple.',
-      icon: 'dance',
     },
     {
       time: '8:00 pm',
@@ -168,6 +169,7 @@ export const timeline = {
       description: 'Dancing and celebrating until the night runs out.',
       icon: 'party',
     },
+    
   ] satisfies TimelineEvent[] as TimelineEvent[],
 } as const
 

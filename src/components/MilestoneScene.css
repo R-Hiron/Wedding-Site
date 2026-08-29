@@ -38,6 +38,7 @@
 .ms-bubble,
 .ms-steam,
 .ms-note,
+.ms-flash,
 .ms-confetti {
   opacity: 0.55;
 }
@@ -137,6 +138,61 @@
     35% {
       opacity: 0.9;
       scale: 1.05;
+    }
+  }
+
+  /* --- The camera focusing, and the flash firing --- */
+  .ms-lens {
+    transform-box: view-box;
+    transform-origin: 48px 56px;
+  }
+
+  .timeline__item.is-revealed .ms-lens {
+    animation: ms-focus 4.6s ease-in-out infinite;
+  }
+
+  @keyframes ms-focus {
+    0%,
+    100% {
+      scale: 1;
+      opacity: 0.3;
+    }
+    50% {
+      scale: 0.78;
+      opacity: 0.6;
+    }
+  }
+
+  .ms-flash {
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+  }
+
+  /* A quick pop and a long wait, so it reads as a shutter rather than a pulse. */
+  .timeline__item.is-revealed .ms-flash {
+    animation: ms-flash 4.6s ease-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-flash--b {
+    animation-duration: 5.8s;
+    animation-delay: 2.3s;
+  }
+
+  @keyframes ms-flash {
+    0%,
+    55%,
+    100% {
+      opacity: 0;
+      scale: 0.5;
+    }
+    8% {
+      opacity: 0.95;
+      scale: 1.15;
+    }
+    24% {
+      opacity: 0;
+      scale: 1.3;
     }
   }
 
