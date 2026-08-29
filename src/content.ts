@@ -247,7 +247,7 @@ export const scrapbook = {
     },
     {
       slug: 'Lexis_18_24',
-      caption: 'Lexis 18th Birthday',
+      caption: 'Lexis 19th Birthday',
       date: 'March 23th, 2024',
       alt: 'Lexis 18th Birthday photo of Riley and Lexi',
     },
