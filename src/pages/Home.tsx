@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { couple, wedding, home, visibility, envelope } from '../content'
 import { Countdown } from '../components/Countdown'
 import { FloralCorners } from '../components/FloralCorners'
+import { WeddingDayTimeline } from '../components/WeddingDayTimeline'
 import { useIntro } from '../lib/introContext'
 import './Home.css'
 
@@ -51,6 +52,8 @@ export function Home() {
       </section>
 
       <Countdown />
+
+      {visibility.showTimeline ? <WeddingDayTimeline /> : null}
     </div>
   )
 }

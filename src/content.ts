@@ -28,6 +28,11 @@ export const visibility = {
   showFaq: true,
   /** Envelope intro overlay shown on every page load. */
   showEnvelopeIntro: true,
+  /**
+   * Wedding-day timeline on the home page. Keep this off until the times in
+   * `timeline.events` are real — the placeholders below are guesses.
+   */
+  showTimeline: false,
 } as const
 
 export const envelope = {
@@ -86,6 +91,76 @@ export const countdown = {
 
   /** Once the ceremony time has passed. */
   afterMessage: 'And so our forever begins.',
+} as const
+
+/** Which line-art illustration is drawn beside a timeline milestone. */
+export type TimelineIcon =
+  | 'arrival'
+  | 'ceremony'
+  | 'cocktails'
+  | 'dinner'
+  | 'dance'
+  | 'party'
+
+export type TimelineEvent = {
+  /** Leave empty to show the milestone without a time. */
+  time: string
+  title: string
+  description?: string
+  icon: TimelineIcon
+}
+
+/**
+ * The wedding-day schedule, shown on the home page as a winding illustrated
+ * route. Hidden until `visibility.showTimeline` is turned on.
+ *
+ * TODO: every time below is a placeholder. Replace them with the real schedule
+ * before showing this to guests.
+ */
+export const timeline = {
+  title: 'The Day Ahead',
+  intro: 'Here is how the day will unfold, from the first hello to the last dance.',
+  /** Optional caveat under the heading. Set to '' once the times are final. */
+  note: 'Times are not final yet and may still shift a little.',
+
+  events: [
+    {
+      time: '2:30 pm',
+      title: 'Guests arrive',
+      description: 'Come find a seat, sign the guest book, and say hello.',
+      icon: 'arrival',
+    },
+    {
+      time: '3:00 pm',
+      title: 'Ceremony',
+      description: 'The part where we say I do.',
+      icon: 'ceremony',
+    },
+    {
+      time: '3:45 pm',
+      title: 'Cocktail hour',
+      description: 'Drinks and photos while we all catch our breath.',
+      icon: 'cocktails',
+    },
+    {
+      time: '5:30 pm',
+      title: 'Dinner',
+      description: 'Dinner, toasts, and probably a few happy tears.',
+      icon: 'dinner',
+    },
+    {
+      time: '7:30 pm',
+      title: 'First dance',
+      description: 'Our first dance as a married couple.',
+      icon: 'dance',
+    },
+    {
+      time: '8:00 pm',
+      title: 'Let the party begin',
+      description: 'Dancing and celebrating until the night runs out.',
+      icon: 'party',
+    },
+  ] satisfies TimelineEvent[] as TimelineEvent[],
 } as const
 
 export type FaqItem = { question: string; answer: string }
