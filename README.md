@@ -1,6 +1,6 @@
 # Riley & Lexi — Wedding Site
 
-Mobile-first guest site for **October 2, 2027** (`02.10.2027`). Cream paper, brown ink, save-the-date pets art.
+Mobile-first guest site for **October 9, 2027** (`09.10.2027`). Cream paper, brown ink, illustrated wedding-day timeline.
 
 ## Quick start
 
@@ -15,9 +15,10 @@ Open the local URL Vite prints (usually `http://localhost:5173`).
 
 All guest-facing copy and section flags live in [`src/content.ts`](src/content.ts):
 
-- `visibility.showVenue` / `showDetails` / `showWeddingParty` — flip to `true` when ready
-- `wedding.location` — set when the venue is decided (Home shows it only if non-empty)
-- FAQ, welcome text, party placeholders
+- `visibility.showVenue` / `showDetails` — flip to hide a section
+- `wedding.location` — the line under the date on the home page
+- `timeline.events` — the wedding-day schedule
+- FAQ, welcome text, venue, and details copy
 
 ## RSVP → Google Sheet
 

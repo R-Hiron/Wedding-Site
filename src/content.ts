@@ -7,13 +7,14 @@ export const couple = {
   displayNamesCaps: 'RILEY AND LEXI',
 } as const
 
-/** Wedding day — October 2, 2027 (matches save-the-date 02.10.2027) */
+/** Wedding day — October 9, 2027, ceremony at 2:00 pm Newfoundland time. */
 export const wedding = {
-  date: new Date('2027-10-02T15:00:00'),
-  dateLabel: 'October 2, 2027',
-  dateShort: '02.10.2027',
-  /** Leave empty until venue is decided — Home will not show a location line. */
-  location: '',
+  /** 2:00 pm NDT (Newfoundland is on daylight time in October). */
+  date: new Date('2027-10-09T14:00:00-02:30'),
+  dateLabel: 'October 9, 2027',
+  dateShort: '09.10.2027',
+  /** Shown under the date on the home page. Leave empty to hide the line. */
+  location: "St. John's, Newfoundland",
 } as const
 
 /**
@@ -21,9 +22,8 @@ export const wedding = {
  * Nav and routes respect these flags.
  */
 export const visibility = {
-  showVenue: false, // False Until Final invitations go out
-  showDetails: false, // False Until Final invitations go out
-  showWeddingParty: false, // False Until Final invitations go out
+  showVenue: true,
+  showDetails: true,
   showRsvp: true,
   showFaq: true,
   /** Envelope intro overlay shown on every page load. */
@@ -52,10 +52,7 @@ export const envelope = {
 export const home = {
   eyebrow: 'The wedding of',
   welcomeTitle: 'You are invited',
-  welcomeBody: `We're so glad you're here. This little corner of the internet is where you'll find everything you need for our wedding day — how to RSVP, answers to common questions, and (soon) all the details once we've locked them in.`,
-  /** Describes the save-the-date artwork for screen readers. */
-  artAlt:
-    "Line drawing of Riley and Lexi's cats and dogs around a champagne tower — save the date, Riley and Lexi are getting married on 02.10.2027, formal invitation to follow",
+  welcomeBody: `We're so glad you're here. This is where you'll find how to RSVP, answers to common questions, and the shape of the day.`,
   signOff: 'With all our love,',
   formalNote: '',
 } as const
@@ -123,8 +120,8 @@ export type TimelineEvent = {
  * The wedding-day schedule, shown on the home page as a winding illustrated
  * route. Hidden until `visibility.showTimeline` is turned on.
  *
- * TODO: every time below is a placeholder. Replace them with the real schedule
- * before showing this to guests.
+ * Edit the times and wording here. The ceremony, reception start, and dinner
+ * match what we know; arrival, photos, and the party time are still loose.
  */
 export const timeline = {
   title: 'The Day Ahead',
@@ -134,39 +131,39 @@ export const timeline = {
 
   events: [
     {
-      time: '2:30 pm',
+      time: '1:30 pm',
       title: 'Guests arrive',
       description: 'Come find a seat, sign the guest book, and say hello.',
       icon: 'arrival',
     },
     {
-      time: '3:00 pm',
+      time: '2:00 pm',
       title: 'Ceremony',
-      description: 'The part where we say I do.',
+      description: 'The part where we say I do, at Pippy Park Courtyard.',
       icon: 'ceremony',
     },
     {
       time: '3:45 pm',
       title: 'Photos',
-      description: 'Photos of the couple and wedding party.',
+      description: 'Photos of the two of us, and anyone who wants to jump in.',
       icon: 'photos',
     },
     {
       time: '5:00 pm',
       title: 'Drinks and snacks',
-      description: 'Drinks and Appetizers.',
+      description: 'The reception starts at The Hub.',
       icon: 'cocktails',
     },
     {
-      time: '5:30 pm',
+      time: '6:00 pm',
       title: 'Dinner',
-      description: 'Dinner and dancing.',
+      description: 'Dinner is served around now.',
       icon: 'dinner',
     },
     {
       time: '8:00 pm',
       title: 'Let the party begin',
-      description: 'Dancing and celebrating until the night runs out.',
+      description: 'Dancing and celebrating until 2:00 am.',
       icon: 'party',
     },
     
@@ -211,7 +208,7 @@ export const scrapbook = {
   /** The last page of the book, after all the photos. */
   closing: {
     line: 'and the next chapter starts',
-    date: 'October 2, 2027',
+    date: 'October 9, 2027',
   },
 
   /** Controls for guests who would rather click than scroll. */
@@ -280,12 +277,16 @@ export const faq: FaqSection[] = [
       {
         question: 'When is the wedding?',
         answer:
-          'Saturday, October 2, 2027 (02.10.2027). Ceremony time and the full schedule will be shared once details are finalized.',
+          'Saturday, October 9, 2027. The ceremony is at 2:00 pm Newfoundland time, and the rest of the day is laid out on the home page.',
       },
       {
         question: 'Where is the wedding?',
         answer:
-          "We'll announce the venue here as soon as we've decided. Check back later — this page will update when we know!",
+          'The ceremony is at Pippy Park Courtyard, 79 Nagles Place. The reception is at The Hub, 21 Merrymeeting Road. Both are in St. John\'s.',
+      },
+      {
+        question: 'Are kids welcome?',
+        answer: 'Yes. Kids are welcome for the whole day.',
       },
     ],
   },
@@ -321,35 +322,64 @@ export const faq: FaqSection[] = [
   },
 ]
 
+export type DetailCard = {
+  title: string
+  body: string
+}
+
 export const details = {
   title: 'Details',
-  comingSoon:
-    'The day-of schedule, attire, and logistics will appear here once everything is set.',
-  schedule: [] as { time: string; event: string }[],
+  intro: 'A few things that are settled. We will add the rest as we lock them in.',
+  cards: [
+    {
+      title: 'Attire',
+      body: 'Wear whatever you will feel comfortable celebrating in. We have not set a dress code, and we do not want anyone fussing over one.',
+    },
+    {
+      title: 'Kids',
+      body: 'Kids are welcome. We would love to have them with us for the day.',
+    },
+    {
+      title: 'Gifts',
+      body: 'If you would like to give a gift, you are welcome to, but please do not feel you have to. Having you there is the part that matters to us.',
+    },
+    {
+      title: 'Getting there',
+      body: 'Parking and travel notes will go here once we have sorted them out.',
+    },
+  ] satisfies DetailCard[] as DetailCard[],
+}
+
+export type VenuePlace = {
+  label: string
+  name: string
+  address: string
+  when: string
+  /** Opens the address in the guest's maps app. */
+  mapUrl: string
 }
 
 export const venue = {
   title: 'Venue',
-  comingSoon:
-    "We're still choosing the perfect spot. The address, map, and travel tips will live here soon.",
-  name: '',
-  address: '',
-}
-
-export type PartyMember = {
-  name: string
-  role: string
-  bio: string
-  photo?: string
-}
-
-export const weddingParty = {
-  title: 'Wedding Party',
-  comingSoon:
-    'Meet the people standing with us — photos and introductions coming soon.',
-  rightHand: [] as PartyMember[],
-  bridesmaids: [] as PartyMember[],
-  groomsmen: [] as PartyMember[],
+  intro: 'The ceremony and the party are in two different spots, both in St. John\'s.',
+  places: [
+    {
+      label: 'Ceremony',
+      name: 'Pippy Park Courtyard',
+      address: '79 Nagles Place',
+      when: '2:00 pm Newfoundland time',
+      mapUrl:
+        'https://www.google.com/maps/search/?api=1&query=79+Nagles+Place+St.+Johns+NL',
+    },
+    {
+      label: 'Reception',
+      name: 'The Hub',
+      address: '21 Merrymeeting Road',
+      when: '5:00 pm to 2:00 am, with dinner around 6:00 pm',
+      mapUrl:
+        'https://www.google.com/maps/search/?api=1&query=21+Merrymeeting+Road+St.+Johns+NL',
+    },
+  ] satisfies VenuePlace[] as VenuePlace[],
 }
 
 /**

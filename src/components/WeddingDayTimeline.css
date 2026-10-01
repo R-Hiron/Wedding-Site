@@ -32,6 +32,7 @@
 .timeline__svg {
   position: absolute;
   inset: 0;
+  z-index: 0;
   width: 100%;
   height: 100%;
   overflow: visible;
@@ -57,8 +58,8 @@
 }
 
 /*
- * Above the route, so each stop's cream medallion hides the line behind it and
- * the road reads as passing through the stop rather than over it.
+ * Above the route, so each stop's panel hides the line behind it and the road
+ * reads as passing through the picture rather than over it.
  */
 .timeline__list {
   position: relative;
@@ -67,43 +68,47 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 9rem;
+  gap: 8rem;
 }
 
 /*
- * The stop alternates between the two edges and the card sits inboard of it, so
- * the route generated through the stops swings right across the section.
+ * The picture sits on an alternating edge and the words sit beside it, so the
+ * route drawn through the pictures can drop through the gap instead of across
+ * the schedule.
  */
 .timeline__item {
-  --stop-size: 5rem;
+  --stop-w: 9rem;
+  --stop-h: 7.15rem;
 
   position: relative;
-  min-height: 6rem;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--space-md);
+  grid-template-columns: var(--stop-w) minmax(0, 1fr);
+  gap: 0.85rem;
   align-items: center;
   text-align: left;
 }
 
 .timeline__item[data-side='right'] {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) var(--stop-w);
   text-align: right;
 }
 
 .timeline__stop {
   grid-row: 1;
   grid-column: 1;
-  width: var(--stop-size);
-  height: var(--stop-size);
+  width: var(--stop-w);
+  height: var(--stop-h);
   display: grid;
   place-items: center;
-  padding: 0.6rem;
+  padding: 0.4rem 0.5rem;
   box-sizing: border-box;
-  border-radius: 50%;
+  border-radius: 1.15rem;
+  z-index: 1;
   /* Opaque, to mask the route behind it. */
   background: var(--color-cream);
-  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--color-ink) 22%, transparent);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in srgb, var(--color-olive) 42%, transparent),
+    0 0.4rem 0 color-mix(in srgb, var(--color-ink) 10%, transparent);
 }
 
 .timeline__item[data-side='right'] .timeline__stop {
@@ -165,7 +170,7 @@
 }
 
 .timeline__route.is-animating .timeline__stop {
-  transform: scale(0.72);
+  transform: scale(0.9);
 }
 
 .timeline__route.is-animating .timeline__item.is-revealed .timeline__card,
@@ -179,26 +184,26 @@
     /* Generous, and deliberately so: the route is drawn against scroll
        position, so the taller the section, the further a guest scrolls to draw
        it and the more unhurried it feels. */
-    gap: 12rem;
+    gap: 11rem;
   }
 
   /*
-   * Wide screens drop the grid and place the stop at a fixed fraction of the
-   * width, which is what gives the route its long sweep from one side to the
-   * other. The card is offset by half a stop plus a gap, so it always sits
-   * just inboard of its own stop.
+   * Wide screens place the picture at a fixed fraction of the width, which is
+   * what gives the route its long sweep from one side to the other. The words
+   * sit just inboard of that picture.
    */
   .timeline__item {
-    --stop-size: 7.5rem;
-    --stop-x: 20%;
-    --card-gap: calc(var(--stop-size) / 2 + var(--space-lg));
+    --stop-w: 16rem;
+    --stop-h: 12.5rem;
+    --stop-x: 16%;
 
-    display: block;
-    min-height: 11rem;
+    display: flex;
+    align-items: center;
+    min-height: var(--stop-h);
   }
 
   .timeline__item[data-side='right'] {
-    --stop-x: 80%;
+    --stop-x: 84%;
   }
 
   .timeline__stop {
@@ -206,14 +211,14 @@
     top: 50%;
     left: var(--stop-x);
     translate: -50% -50%;
-    padding: 0.9rem;
+    padding: 0.85rem 1rem;
   }
 
   /* `translate` and `scale` are separate properties here, so the reveal can
      animate the scale without dropping the centring. */
   .timeline__route.is-animating .timeline__stop {
     transform: none;
-    scale: 0.72;
+    scale: 0.9;
     transition:
       opacity 700ms ease,
       scale 700ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -224,16 +229,16 @@
   }
 
   .timeline__card {
-    width: min(24rem, 46%);
+    width: min(18rem, 34%);
   }
 
   .timeline__item[data-side='left'] .timeline__card {
-    margin-left: calc(var(--stop-x) + var(--card-gap));
+    margin-left: calc(var(--stop-x) + var(--stop-w) / 2 + var(--space-md));
   }
 
   .timeline__item[data-side='right'] .timeline__card {
     margin-left: auto;
-    margin-right: calc(100% - var(--stop-x) + var(--card-gap));
+    margin-right: calc(100% - var(--stop-x) + var(--stop-w) / 2 + var(--space-md));
   }
 }
 

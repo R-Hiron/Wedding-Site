@@ -10,7 +10,6 @@ import { Faq } from './pages/Faq'
 import { Rsvp } from './pages/Rsvp'
 import { Details } from './pages/Details'
 import { Venue } from './pages/Venue'
-import { Party } from './pages/Party'
 import { visibility } from './content'
 
 function Gated({
@@ -76,14 +75,6 @@ export default function App() {
             element={
               <Gated allowed={visibility.showVenue}>
                 <Venue />
-              </Gated>
-            }
-          />
-          <Route
-            path="party"
-            element={
-              <Gated allowed={visibility.showWeddingParty}>
-                <Party />
               </Gated>
             }
           />

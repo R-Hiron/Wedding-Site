@@ -1,7 +1,7 @@
 /*
  * Movement for the illustrated stops on the wedding-day route.
  *
- * Everything here is small, slow and looping — enough to make each stop feel
+ * Everything here is small, slow and looping — enough to make each scene feel
  * alive without pulling attention off the schedule itself. Animations are gated
  * on `.is-revealed`, so a scene only starts once the drawn route has reached it,
  * and the whole file is wrapped in a reduced-motion guard.
@@ -12,26 +12,54 @@
   height: 100%;
   color: var(--color-olive);
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 2.6;
   stroke-linecap: round;
   stroke-linejoin: round;
   fill: none;
   overflow: visible;
 }
 
-/* Resting positions, so the art still reads when nothing is moving. */
-.ms-glass {
+.ms-blob {
+  fill: currentColor;
+  fill-opacity: 0.16;
+}
+
+/* Matches the panel, so the printed photo can slide out from behind the body. */
+.ms-solid {
+  fill: var(--color-cream);
+}
+
+.ms-glass,
+.ms-record,
+.ms-arm,
+.ms-heart,
+.ms-polaroid,
+.ms-snack,
+.ms-flame,
+.ms-dancer {
   transform-box: view-box;
 }
 
 .ms-glass--left {
-  transform-origin: 34px 74px;
-  transform: rotate(-13deg);
+  transform-origin: 32px 74px;
+  transform: rotate(-12deg);
 }
 
 .ms-glass--right {
-  transform-origin: 62px 74px;
-  transform: rotate(13deg);
+  transform-origin: 96px 74px;
+  transform: rotate(12deg);
+}
+
+.ms-arm--a {
+  transform-origin: 14px 66px;
+}
+
+.ms-arm--b {
+  transform-origin: 114px 66px;
+}
+
+.ms-polaroid {
+  transform: translateY(8px);
 }
 
 .ms-glint,
@@ -43,8 +71,17 @@
   opacity: 0.55;
 }
 
+.ms-heart,
+.ms-flame {
+  opacity: 0.85;
+}
+
+.ms-heart {
+  fill-opacity: 0.45;
+  transform-origin: 64px 22px;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  /* --- Petals through the arch --- */
   .ms-petal {
     transform-box: fill-box;
     transform-origin: center;
@@ -77,12 +114,40 @@
       opacity: 0.85;
     }
     100% {
-      transform: translate(-7px, 40px) rotate(150deg);
+      transform: translate(-8px, 42px) rotate(150deg);
       opacity: 0;
     }
   }
 
-  /* --- Rings settling together --- */
+  .timeline__item.is-revealed .ms-arm--a {
+    animation: ms-wave-left 2.6s ease-in-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-arm--b {
+    animation: ms-wave-right 2.6s ease-in-out infinite;
+    animation-delay: 0.4s;
+  }
+
+  @keyframes ms-wave-left {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(-32deg);
+    }
+  }
+
+  @keyframes ms-wave-right {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    50% {
+      transform: rotate(32deg);
+    }
+  }
+
   .ms-ring {
     transform-box: view-box;
   }
@@ -98,7 +163,7 @@
   @keyframes ms-ring-left {
     0%,
     100% {
-      transform: translateX(-5px);
+      transform: translateX(-6px);
     }
     50% {
       transform: translateX(0);
@@ -108,10 +173,26 @@
   @keyframes ms-ring-right {
     0%,
     100% {
-      transform: translateX(5px);
+      transform: translateX(6px);
     }
     50% {
       transform: translateX(0);
+    }
+  }
+
+  .timeline__item.is-revealed .ms-heart {
+    animation: ms-heart 4.8s ease-in-out infinite;
+  }
+
+  @keyframes ms-heart {
+    0%,
+    100% {
+      transform: translateY(4px) scale(0.92);
+      opacity: 0.35;
+    }
+    50% {
+      transform: translateY(-6px) scale(1);
+      opacity: 0.9;
     }
   }
 
@@ -141,10 +222,24 @@
     }
   }
 
-  /* --- The camera focusing, and the flash firing --- */
+  .timeline__item.is-revealed .ms-polaroid {
+    animation: ms-print 4.8s ease-in-out infinite;
+  }
+
+  @keyframes ms-print {
+    0%,
+    100% {
+      transform: translateY(2px);
+    }
+    45%,
+    70% {
+      transform: translateY(12px);
+    }
+  }
+
   .ms-lens {
     transform-box: view-box;
-    transform-origin: 48px 56px;
+    transform-origin: 64px 52px;
   }
 
   .timeline__item.is-revealed .ms-lens {
@@ -155,11 +250,11 @@
     0%,
     100% {
       scale: 1;
-      opacity: 0.3;
+      opacity: 0.35;
     }
     50% {
-      scale: 0.78;
-      opacity: 0.6;
+      scale: 0.72;
+      opacity: 0.7;
     }
   }
 
@@ -169,7 +264,6 @@
     opacity: 0;
   }
 
-  /* A quick pop and a long wait, so it reads as a shutter rather than a pulse. */
   .timeline__item.is-revealed .ms-flash {
     animation: ms-flash 4.6s ease-out infinite;
   }
@@ -196,7 +290,6 @@
     }
   }
 
-  /* --- Glasses meeting for a clink --- */
   .timeline__item.is-revealed .ms-glass--left {
     animation: ms-clink-left 4.8s ease-in-out infinite;
   }
@@ -208,22 +301,40 @@
   @keyframes ms-clink-left {
     0%,
     100% {
-      transform: rotate(-13deg);
+      transform: rotate(-12deg);
     }
     45%,
     60% {
-      transform: rotate(-3deg);
+      transform: rotate(-2deg);
     }
   }
 
   @keyframes ms-clink-right {
     0%,
     100% {
-      transform: rotate(13deg);
+      transform: rotate(12deg);
     }
     45%,
     60% {
-      transform: rotate(3deg);
+      transform: rotate(2deg);
+    }
+  }
+
+  .ms-snack {
+    transform-origin: 64px 78px;
+  }
+
+  .timeline__item.is-revealed .ms-snack {
+    animation: ms-bob 3.4s ease-in-out infinite;
+  }
+
+  @keyframes ms-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
     }
   }
 
@@ -255,12 +366,11 @@
       opacity: 0.7;
     }
     100% {
-      transform: translateY(-14px);
+      transform: translateY(-16px);
       opacity: 0;
     }
   }
 
-  /* --- Dinner steaming --- */
   .ms-steam {
     transform-box: fill-box;
     transform-origin: bottom;
@@ -285,15 +395,33 @@
       opacity: 0.6;
     }
     100% {
-      transform: translateY(-8px) scaleY(1.1);
+      transform: translateY(-10px) scaleY(1.1);
       opacity: 0;
     }
   }
 
-  /* --- The record turning, and the music off it --- */
+  .ms-flame {
+    transform-origin: 115.5px 58px;
+  }
+
+  .timeline__item.is-revealed .ms-flame {
+    animation: ms-flicker 1.6s ease-in-out infinite;
+  }
+
+  @keyframes ms-flicker {
+    0%,
+    100% {
+      transform: scaleY(1) scaleX(1);
+      opacity: 0.75;
+    }
+    50% {
+      transform: scaleY(1.18) scaleX(0.86);
+      opacity: 1;
+    }
+  }
+
   .ms-record {
-    transform-box: view-box;
-    transform-origin: 44px 58px;
+    transform-origin: 48px 58px;
   }
 
   .timeline__item.is-revealed .ms-record {
@@ -334,7 +462,6 @@
     }
   }
 
-  /* --- Lights and confetti --- */
   .timeline__item.is-revealed .ms-bulb {
     animation: ms-twinkle 3.6s ease-in-out infinite;
   }
@@ -362,6 +489,33 @@
     }
     50% {
       opacity: 1;
+    }
+  }
+
+  .ms-dancer--a {
+    transform-origin: 34px 86px;
+  }
+
+  .ms-dancer--b {
+    transform-origin: 94px 86px;
+  }
+
+  .timeline__item.is-revealed .ms-dancer--a {
+    animation: ms-sway 2.8s ease-in-out infinite;
+  }
+
+  .timeline__item.is-revealed .ms-dancer--b {
+    animation: ms-sway 2.8s ease-in-out infinite reverse;
+    animation-delay: 0.35s;
+  }
+
+  @keyframes ms-sway {
+    0%,
+    100% {
+      transform: rotate(-8deg);
+    }
+    50% {
+      transform: rotate(8deg);
     }
   }
 
@@ -402,7 +556,7 @@
       opacity: 0.75;
     }
     100% {
-      transform: translate(4px, 20px) rotate(220deg);
+      transform: translate(4px, 22px) rotate(220deg);
       opacity: 0;
     }
   }

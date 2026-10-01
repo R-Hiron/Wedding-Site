@@ -1,0 +1,63 @@
+.guest-page {
+  text-align: center;
+}
+
+.guest-page__title {
+  margin: 0 0 var(--space-sm);
+  font-size: clamp(2.5rem, 8vw, 3.75rem);
+}
+
+.guest-page__intro {
+  width: min(100%, 32rem);
+  margin: 0 auto var(--space-lg);
+  color: var(--color-ink-soft);
+}
+
+.guest-page__cards {
+  display: grid;
+  gap: var(--space-md);
+  width: min(100%, 36rem);
+  margin-inline: auto;
+  text-align: left;
+}
+
+.guest-card {
+  padding: var(--space-md);
+  background: var(--color-cream-dark);
+  border-radius: 1rem;
+}
+
+.guest-card__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.6rem;
+  color: var(--color-olive);
+}
+
+.guest-card__title {
+  margin: 0 0 0.4rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.12em;
+}
+
+.guest-card__when {
+  margin: 0 0 0.35rem;
+  color: var(--color-ink);
+}
+
+.guest-card__body {
+  margin: 0;
+  color: var(--color-ink-soft);
+}
+
+.guest-card__link {
+  display: inline-block;
+  margin-top: var(--space-sm);
+  font-size: 0.6rem;
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.guest-card__link:hover {
+  color: var(--color-olive);
+}

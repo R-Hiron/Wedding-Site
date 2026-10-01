@@ -1,22 +1,19 @@
 import { details } from '../content'
-import './ComingSoon.css'
+import './GuestPage.css'
 
 export function Details() {
   return (
-    <div className="coming-soon page-inner">
-      <h1 className="coming-soon__title script">{details.title}</h1>
-      {details.schedule.length === 0 ? (
-        <p className="coming-soon__body">{details.comingSoon}</p>
-      ) : (
-        <ul className="coming-soon__schedule">
-          {details.schedule.map((item) => (
-            <li key={item.time + item.event}>
-              <span className="sans-caps">{item.time}</span>
-              <span>{item.event}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="guest-page page-inner">
+      <h1 className="guest-page__title script">{details.title}</h1>
+      <p className="guest-page__intro">{details.intro}</p>
+      <div className="guest-page__cards">
+        {details.cards.map((card) => (
+          <article key={card.title} className="guest-card">
+            <h2 className="guest-card__title serif-caps">{card.title}</h2>
+            <p className="guest-card__body">{card.body}</p>
+          </article>
+        ))}
+      </div>
     </div>
   )
 }

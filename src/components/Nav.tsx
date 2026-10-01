@@ -8,7 +8,6 @@ function buildLinks(): NavItem[] {
   const links: NavItem[] = [{ to: '/', label: 'Home', end: true }]
   if (visibility.showVenue) links.push({ to: '/venue', label: 'Venue' })
   if (visibility.showDetails) links.push({ to: '/details', label: 'Details' })
-  if (visibility.showWeddingParty) links.push({ to: '/party', label: 'Wedding Party' })
   if (visibility.showFaq) links.push({ to: '/faq', label: 'FAQ' })
   if (visibility.showRsvp) links.push({ to: '/rsvp', label: 'RSVP' })
   return links

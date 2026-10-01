@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { couple, wedding, home, visibility, envelope } from '../content'
 import { Countdown } from '../components/Countdown'
 import { FloralCorners } from '../components/FloralCorners'
-import { SaveTheDate } from '../components/SaveTheDate'
 import { Scrapbook } from '../components/Scrapbook'
 import { WeddingDayTimeline } from '../components/WeddingDayTimeline'
 import { useIntro } from '../lib/introContext'
@@ -21,7 +20,6 @@ export function Home() {
         {wedding.location ? (
           <p className="home-hero__location sans-caps">{wedding.location}</p>
         ) : null}
-        <SaveTheDate />
         {home.formalNote ? (
           <p className="home-hero__formal sans-caps">{home.formalNote}</p>
         ) : null}

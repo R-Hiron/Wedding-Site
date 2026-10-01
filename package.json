@@ -15,8 +15,7 @@
     "verify:timeline": "node scripts/verify-timeline.mjs",
     "verify:scrapbook": "node scripts/verify-scrapbook.mjs",
     "verify:rsvp": "node scripts/verify-rsvp.mjs",
-    "check:rsvp": "node scripts/check-endpoint.mjs",
-    "verify:card": "node scripts/verify-save-the-date.mjs"
+    "check:rsvp": "node scripts/check-endpoint.mjs"
   },
   "dependencies": {
     "gsap": "^3.15.0",
